@@ -1,0 +1,1 @@
+"""API HTTP (FastAPI) do E-COMMERCE AI EMPIRE."""

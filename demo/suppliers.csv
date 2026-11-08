@@ -1,0 +1,5 @@
+name;contact;url;min_qty;unit_price;lead_time_days;shipping_cost;notes
+Distribuidora Livros Sul;contato@exemplo.invalido;https://exemplo.invalido/forn1;30;13,90;7;45,00;DEMO - dados fictícios
+Papelaria Atacado SP;vendas@exemplo.invalido;https://exemplo.invalido/forn2;100;10,80;12;120,00;DEMO - dados fictícios
+Grafica Rápida Editora;pedidos@exemplo.invalido;https://exemplo.invalido/forn3;10;16,50;3;25,00;DEMO - dados fictícios
+Importadora Papel & Cia;compras@exemplo.invalido;https://exemplo.invalido/forn4;200;8,20;21;0,00;DEMO - dados fictícios

@@ -401,3 +401,44 @@ O que falta para operar de verdade depende de você, não de código:
 | Suas vendas | única forma de medir resultado de verdade |
 
 Nenhuma dessas informações é inventada pelo sistema. Se faltar, ele diz que falta.
+
+## Conversar com o agente (comandos em português)
+
+Três jeitos de mandar comando, todos no mesmo motor dos 12 agentes e com as mesmas
+travas de aprovação:
+
+**1. Terminal**
+
+```bash
+python -m core.chat
+```
+```
+você › analise o livro de colorir na shopee e calcule a margem
+agente › ✅ Intenção: Pesquisa de produtos · 5/5 etapas concluídas
+          (relatório completo abaixo)
+```
+
+**2. Telegram (funciona no celular, sem servidor público)**
+
+```bash
+# 1. fale com @BotFather no Telegram, envie /newbot e copie o token
+# 2. no .env: TELEGRAM_BOT_TOKEN=123456:ABC...
+#    opcional, para o bot não ficar aberto a estranhos:
+#    TELEGRAM_ALLOWED_CHAT_IDS=seu_chat_id
+python -m scripts.telegram_bot
+```
+
+Usa long polling: não precisa de domínio, porta aberta nem deploy. Basta o processo
+rodando (seu PC, uma VM grátis ou um container).
+
+**3. API HTTP**
+
+```bash
+curl -X POST http://localhost:8000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"text":"status"}'
+```
+
+Comandos rápidos reconhecidos sem IA: `status`, `produtos`, `pendentes`,
+`aprovar 1`, `rejeitar 1`, `pausar`, `retomar`, `modo`, `relatório`, `ajuda`.
+Qualquer outra frase vira um comando para o CEO AI.

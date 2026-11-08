@@ -27,6 +27,11 @@ class CommandBody(BaseModel):
     requested_by: str = "proprietario"
 
 
+class ChatBody(BaseModel):
+    text: str = Field(..., min_length=1, max_length=4000)
+    user: str = "proprietario"
+
+
 class ScoreBody(BaseModel):
     name: str = "Produto"
     demanda: float | None = None
@@ -90,6 +95,28 @@ def ai_status() -> dict[str, Any]:
 
 
 # ------------------------------------------------------------------------ CEO --
+@router.post("/chat")
+def chat(body: ChatBody) -> dict[str, Any]:
+    """Comando em linguagem natural no mesmo motor do chat do terminal/Telegram."""
+    from core.chat_agent import ChatAgent
+
+    agente = ChatAgent(orchestrator=get_orchestrator(), user=body.user)
+    resposta = agente.handle_message(body.text)
+    return {
+        "reply": resposta.reply,
+        "kind": resposta.kind,
+        "wait_for_approval": resposta.wait_for_approval,
+        "history": agente.historico(6),
+    }
+
+
+@router.get("/chat/history")
+def chat_history(limit: int = 20) -> list[dict[str, Any]]:
+    from core.chat_agent import ChatAgent
+
+    return ChatAgent(orchestrator=get_orchestrator()).historico(min(limit, 100))
+
+
 @router.post("/ceo/command")
 def ceo_command(body: CommandBody) -> dict[str, Any]:
     return get_orchestrator().handle(body.command, requested_by=body.requested_by)

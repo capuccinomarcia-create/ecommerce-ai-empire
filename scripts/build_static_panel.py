@@ -486,6 +486,10 @@ const VIEWS = {
               <td>Comprar, pagar, publicar anúncio, mudar preço, excluir produto,
                   mandar mensagem em massa, mexer em campanha.</td></tr>
         </tbody></table>
+        <div class="note" style="margin-top:12px">Você também pode mandar comando em português,
+        como faz com um assistente: <code>python -m core.chat</code> no terminal ou
+        <code>python -m scripts.telegram_bot</code> para falar com ele pelo Telegram
+        (só precisa do token do @BotFather, sem servidor público).</div>
         <div class="note" style="margin-top:12px">Para rodar sem ninguém abrir o painel:
         <code>python -m core.autonomy --loop</code>. Sem esse processo ativo, ele só roda no botão.</div>
       </section>`;

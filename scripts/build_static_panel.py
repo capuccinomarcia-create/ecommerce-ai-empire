@@ -161,6 +161,10 @@ def collect_data() -> dict:
             }
         )
 
+    from core import data_mode
+
+    config = data_mode.resumo(repo, get_settings())
+
     estado_autonomia = repo.get_setting("autonomy_state", {}) or {}
     ultimo_relatorio = repo.find("reports", {}, order_by="-created_at", limit=1)
     autonomia = {
@@ -207,6 +211,8 @@ def collect_data() -> dict:
         "channels": channels,
         "viability": viability,
         "autonomia": autonomia,
+        "config": config,
+        "mode": config["mode"],
         "marketplaces": [
             {"slug": m.get("slug"), "name": m.get("name"),
              "commission_pct": m.get("commission_pct"), "fixed_fee": m.get("fixed_fee"),
@@ -387,6 +393,31 @@ function tagFor(score){
 }
 
 const VIEWS = {
+  modoBanner(){
+    const c = DATA.config || {mode:"demo", prontos:0, total:0, itens:[]};
+    const real = c.mode === "real";
+    const pend = c.itens.filter(i => !i.ok);
+    const cor = real ? (pend.length ? "mid" : "ok") : "off";
+    return `
+      <div class="panel" style="border-left:4px solid ${real ? "#0f766e" : "#94a3b8"}">
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+          <div style="font-weight:700;font-size:14px">
+            ${real ? "MODO REAL" : "MODO DEMO"} · ${c.prontos}/${c.total} itens de operação prontos
+          </div>
+          <span class="tag ${cor}">${real ? (pend.length ? "faltam dados seus" : "pronto para operar") : "dados de teste"}</span>
+        </div>
+        <table style="margin-top:10px"><thead><tr><th style="width:34px"></th><th>Item</th>
+          <th>Situação</th><th>Como resolver</th></tr></thead><tbody>
+        ${c.itens.map(i => `<tr>
+          <td>${i.ok ? "✔" : "—"}</td>
+          <td style="font-weight:600">${esc(i.item)}</td>
+          <td style="font-size:12.5px">${esc(i.detalhe)}</td>
+          <td style="font-size:12px;color:#64748b">${i.ok ? "" : esc(i.como)}</td>
+        </tr>`).join("")}
+        </tbody></table>
+      </div>`;
+  },
+
   home(){
     const k = DATA.kpis;
     const top = DATA.products.filter(p => p.fin && p.fin.netProfit !== undefined)
@@ -394,6 +425,7 @@ const VIEWS = {
     return `
       <h2>Visão geral da operação</h2>
       <div class="hint">Cada número vem do banco do sistema. Margens e lucros são calculados por código, nunca estimados por IA.</div>
+      ${modoBanner()}
       ${DATA.has_demo ? `<div class="note">Há registros marcados como <b>DEMO</b>. Eles servem para testar o painel e não devem ser confundidos com dados reais de operação.</div>` : ""}
       <div class="grid">
         ${cardKpi("Produtos", k.products, "catálogo analisado")}

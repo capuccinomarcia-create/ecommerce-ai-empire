@@ -1,0 +1,2 @@
+name;sku;category;description;purchase_price;extra_cost;sale_price;marketplace;status;supplier
+COLOQUE_SEU_PRODUTO_AQUI;SKU-001;categoria;descrição curta;0,00;0,00;0,00;shopee;ativo;nome do fornecedor

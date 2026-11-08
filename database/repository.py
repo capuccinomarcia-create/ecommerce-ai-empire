@@ -518,7 +518,8 @@ class SQLiteRepository:
             try:
                 return json.loads(raw)
             except (TypeError, ValueError):
-                return default
+                # strings simples são gravadas sem JSON: 'real', 'demo', etc.
+                return raw
         return raw if raw is not None else default
 
     # ----------------------------------------------------------------- raw --

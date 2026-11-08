@@ -375,3 +375,29 @@ computador ligado, uma VM gratuita (Oracle Cloud Free Tier) ou um serviço de
 container com plano free. Streamlit Community Cloud e GitHub Actions não servem
 para processo contínuo (o primeiro dorme, o segundo tem limite de minutos e não
 guarda o banco).
+
+## Sair do modo DEMO e operar de verdade
+
+```bash
+python -m scripts.setup_real --templates   # cria templates/*.csv para você preencher
+python -m scripts.setup_real --checklist   # mostra o que ainda falta
+python -m scripts.setup_real --aplicar     # modo REAL: apaga todos os registros DEMO
+python -m scripts.setup_real --importar pasta_com_seus_csvs
+```
+
+Em modo real o sistema não mistura nada: os registros DEMO são apagados do banco
+(e não apenas escondidos), e os prazos marcados como DEMO voltam para
+"não informado" para não virarem número inventado.
+
+O que falta para operar de verdade depende de você, não de código:
+
+| Item | Por que é indispensável |
+|---|---|
+| Seus produtos | preço de compra e de venda reais; sem eles não existe margem |
+| Seus fornecedores | prazo, frete e quantidade mínima decidem se dá para vender |
+| Taxas do marketplace | comissão e taxa fixa reais; taxa chutada vira lucro falso |
+| Prazo de despacho do canal | é o que a plataforma te cobra; veja no painel de vendedor |
+| Chave de IA (opcional) | sem ela os agentes trabalham só com os seus dados |
+| Suas vendas | única forma de medir resultado de verdade |
+
+Nenhuma dessas informações é inventada pelo sistema. Se faltar, ele diz que falta.

@@ -13,8 +13,9 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from dashboard import (agents, automations, ceo_chat, competitors, customers,  # noqa: E402
-                       financial, home, instagram, marketing, mercadolivre,
+from dashboard import (agents, automations, bot_page, ceo_chat, competitors,  # noqa: E402
+                       customers, financial, home, instagram, marketing,
+                       mercadolivre,
                        own_store, product_research, products, reports, sales,
                        settings, shopee, suppliers, tiktok, video_creator)
 from dashboard.common import login_gate, notice, orch, page_header  # noqa: E402
@@ -44,6 +45,7 @@ PAGES = [
     ("Clientes", customers.render),
     ("Relatórios", reports.render),
     ("Automações", automations.render),
+    ("Bot no celular", bot_page.render),
     ("Configurações", settings.render),
     ("Catálogo", products.render),
     ("Vendas", sales.render),

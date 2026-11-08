@@ -370,6 +370,7 @@ if (typeof module !== "undefined") module.exports = {calcular};
 const PAGES = [
   ["home", "Visão geral"],
   ["agente", "Super agente"],
+  ["bot", "Bot no celular"],
   ["products", "Produtos"],
   ["opps", "Oportunidades"],
   ["prazos", "Prazos e fornecedores"],
@@ -645,6 +646,40 @@ const VIEWS = {
       </section>`;
   },
 
+  bot(){
+    return `
+      <div class="panel" style="border-left:4px solid #0f766e">
+        <div style="font-weight:700;margin-bottom:6px">Ligar o bot é um clique — mas não
+        neste endereço</div>
+        <p class="muted" style="margin:0 0 10px">
+          Este painel publicado é HTML estático: um botão aqui não consegue iniciar
+          processo no seu computador. O botão que liga o bot existe no painel Streamlit
+          (aba <b>Bot no celular</b>), que roda na sua máquina ou servidor, e no terminal.
+        </p>
+        <table><thead><tr><th style="width:40%">Como ligar</th><th>Comando</th></tr></thead><tbody>
+          <tr><td>Painel Streamlit</td><td><code>streamlit run dashboard/streamlit_app.py</code> → aba Bot no celular → Ligar o bot</td></tr>
+          <tr><td>Terminal</td><td><code>python -m scripts.bot_control start</code></td></tr>
+          <tr><td>Ver estado</td><td><code>python -m scripts.bot_control status</code></td></tr>
+          <tr><td>Desligar</td><td><code>python -m scripts.bot_control stop</code></td></tr>
+          <tr><td>Log do bot</td><td><code>python -m scripts.bot_control log --lines 40</code></td></tr>
+        </tbody></table>
+      </div>
+
+      <div class="panel">
+        <div style="font-weight:700;margin-bottom:8px">O que o bot executa quando você manda mensagem</div>
+        <table><thead><tr><th>Você escreve</th><th>Ele faz</th></tr></thead><tbody>
+          <tr><td><code>status</code></td><td>Mostra modo, produtos, pendências e último ciclo</td></tr>
+          <tr><td><code>vendas</code></td><td>Preço com margem alvo, estoque mínimo e o que falta no anúncio</td></tr>
+          <tr><td><code>pendentes</code> / <code>aprovar 1</code></td><td>Lista e decide o que espera sua autorização</td></tr>
+          <tr><td><code>pausar</code> / <code>retomar</code></td><td>Liga e desliga os ciclos autônomos</td></tr>
+          <tr><td>qualquer frase</td><td>Vira plano do CEO AI com os 12 agentes</td></tr>
+        </tbody></table>
+        <p class="muted" style="margin:10px 0 0">
+          Sem <code>TELEGRAM_BOT_TOKEN</code> no <code>.env</code> o botão não liga: é a única
+          peça que só você pode obter, com o @BotFather no Telegram.
+        </p>
+      </div>`;
+  },
   agents(){
     return `
       <h2>Central de agentes</h2>

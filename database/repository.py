@@ -14,6 +14,7 @@ from __future__ import annotations
 import json
 import re
 import sqlite3
+import tempfile
 import threading
 from pathlib import Path
 from typing import Any, Iterable
@@ -200,9 +201,23 @@ class SQLiteRepository:
 
     backend = "sqlite"
 
+    @staticmethod
+    def _resolve_path(path: Path) -> Path:
+        """Usa o caminho pedido; se o disco for somente leitura (hospedagem gerenciada),
+        cai para um diretório temporário gravável em vez de quebrar a aplicação."""
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            probe = path.parent / ".write_probe"
+            probe.write_text("ok", encoding="utf-8")
+            probe.unlink(missing_ok=True)
+            return path
+        except OSError:
+            fallback = Path(tempfile.gettempdir()) / path.name
+            fallback.parent.mkdir(parents=True, exist_ok=True)
+            return fallback
+
     def __init__(self, path: str | Path):
-        self.path = Path(path)
-        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.path = self._resolve_path(Path(path))
         self._lock = threading.RLock()
         self._conn = sqlite3.connect(str(self.path), check_same_thread=False)
         self._conn.row_factory = sqlite3.Row

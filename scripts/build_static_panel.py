@@ -425,7 +425,7 @@ const VIEWS = {
     return `
       <h2>Visão geral da operação</h2>
       <div class="hint">Cada número vem do banco do sistema. Margens e lucros são calculados por código, nunca estimados por IA.</div>
-      ${modoBanner()}
+      ${VIEWS.modoBanner()}
       ${DATA.has_demo ? `<div class="note">Há registros marcados como <b>DEMO</b>. Eles servem para testar o painel e não devem ser confundidos com dados reais de operação.</div>` : ""}
       <div class="grid">
         ${cardKpi("Produtos", k.products, "catálogo analisado")}

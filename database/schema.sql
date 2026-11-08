@@ -234,6 +234,12 @@ create table if not exists sales (
 );
 
 -- --------------------------------------------------------- oportunidades --
+create table if not exists stock_movements (
+  id text primary key, product_id text not null, kind text not null default 'entrada',
+  quantity integer not null default 0, note text, reference text,
+  created_at timestamptz not null default now(), is_demo boolean not null default false
+);
+
 create table if not exists opportunities (
   id uuid primary key default gen_random_uuid(),
   name text not null,

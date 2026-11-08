@@ -35,6 +35,7 @@ AJUDA = """Comandos que eu executo:
 
 *Operação*
 • status — como está a operação agora
+• vendas — plano de venda: preço, estoque e anúncio
 • produtos — catálogo com margem calculada
 • relatório — último relatório do CEO
 • pendentes — o que espera sua aprovação
@@ -255,6 +256,13 @@ class ChatAgent:
 
         if baixo in {"produtos", "/produtos", "catalogo", "catálogo", "meus produtos"}:
             return self._produtos()
+
+        if baixo in {"vendas", "venda", "/vendas", "plano de vendas", "plano de venda",
+                     "o que fazer para vender", "como vender"}:
+            from core.sales_ops import SalesOperator, resumo_texto
+
+            plano = SalesOperator(self.orchestrator.repo).plano()
+            return Resposta(resumo_texto(plano), kind="lista", data=plano)
 
         if baixo in {"relatorio", "relatório", "/relatorio", "ultimo relatorio"}:
             return self._relatorio()

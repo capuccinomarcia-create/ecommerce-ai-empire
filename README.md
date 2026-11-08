@@ -469,3 +469,25 @@ Guias com opções gratuitas:
 
 Compras, pagamentos e publicações continuam exigindo sua aprovação explícita. O
 processo pode rodar 24h sem que nada seja gasto sem você mandar.
+
+
+## Operador de vendas (o bot trabalhando na venda)
+
+```bash
+python -m scripts.sales_plan            # plano do dia
+python -m scripts.sales_plan --json     # para usar em outro sistema
+```
+
+Para cada produto ativo ele calcula, sem IA opinando:
+
+1. preço que entrega a margem alvo, com a comissão e a taxa fixa reais do canal;
+2. estoque mínimo pelo prazo do fornecedor (7 dias) mais 2 de segurança, e quanto repor
+   com base nas vendas dos últimos 30 dias;
+3. checklist do anúncio: nome, custo, preço, descrição, categoria, taxa do canal, prazo;
+4. veredito por produto: pronto para publicar, faltam ajustes ou bloqueado por dado.
+
+No chat: `status`, `vendas`, `pendentes`, `aprovar 1`.
+
+Limite deliberado: o bot monta o rascunho do anúncio e opera os números, mas publicar,
+comprar ou pagar depende de aprovação sua e de credenciais do marketplace
+(`SHOPEE_PARTNER_ID`, `SHOPEE_PARTNER_KEY`, `SHOPEE_SHOP_ID` no `.env`, nunca no repo).

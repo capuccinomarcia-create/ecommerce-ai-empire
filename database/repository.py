@@ -27,7 +27,7 @@ _IDENT = re.compile(r"^[a-z_][a-z0-9_]*$")
 TABLES: tuple[str, ...] = (
     "users", "agents", "tasks", "task_events", "memories", "approvals",
     "audit_logs", "categories", "suppliers", "products", "competitors",
-    "listings", "marketplaces", "costs", "sales", "opportunities", "reports",
+    "listings", "marketplaces", "costs", "sales", "stock_movements", "opportunities", "reports",
     "automations", "ai_usage", "settings_kv",
 )
 
@@ -160,6 +160,12 @@ CREATE TABLE IF NOT EXISTS sales (
   fees REAL NOT NULL DEFAULT 0, shipping REAL NOT NULL DEFAULT 0,
   taxes REAL NOT NULL DEFAULT 0, total REAL NOT NULL DEFAULT 0,
   sold_at TEXT NOT NULL, is_demo INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS stock_movements (
+  id TEXT PRIMARY KEY, product_id TEXT NOT NULL, kind TEXT NOT NULL DEFAULT 'entrada',
+  quantity INTEGER NOT NULL DEFAULT 0, note TEXT, reference TEXT,
+  created_at TEXT NOT NULL, is_demo INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS opportunities (

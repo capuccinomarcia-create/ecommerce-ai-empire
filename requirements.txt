@@ -1,0 +1,20 @@
+# E-COMMERCE AI EMPIRE - dependências (todas gratuitas / open source)
+# Python 3.11+
+
+# API
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.32,<1.0
+httpx>=0.27,<1.0
+
+# Validação e configuração
+pydantic>=2.9,<3.0
+
+# Painel
+streamlit>=1.40,<2.0
+pandas>=2.2,<3.0
+
+# Testes
+pytest>=8.0,<9.0
+
+# Opcional (somente se DATABASE_BACKEND=supabase)
+# supabase>=2.9,<3.0

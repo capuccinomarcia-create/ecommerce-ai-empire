@@ -1,0 +1,37 @@
+# Ambiente e segredos (NUNCA versionar)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets*
+.agents/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# Dados locais e logs
+data/*.db
+data/*.sqlite3
+data/*.sqlite
+logs/
+*.log
+exports/
+imports/*.csv
+!demo/*.csv
+
+# Streamlit
+.streamlit/secrets.toml
+
+# SO
+.DS_Store
+Thumbs.db

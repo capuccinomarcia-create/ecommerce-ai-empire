@@ -86,7 +86,8 @@ def responder(agente: ChatAgent, chat_id: str, texto: str,
 
 def rodar(token: str, allowlist: set[str] | None = None, uma_vez: bool = False,
           intervalo: float = 1.0, agente: ChatAgent | None = None,
-          chamar: Callable[..., dict] | None = None) -> int:
+          chamar: Callable[..., dict] | None = None,
+          parar: Any = None) -> int:
     allowlist = allowlist if allowlist is not None else autorizados_do_env()
     agente = agente or ChatAgent()
     chamar = chamar or _chamar
@@ -97,6 +98,8 @@ def rodar(token: str, allowlist: set[str] | None = None, uma_vez: bool = False,
         chamar(token, "sendMessage", {"chat_id": chat_id, "text": texto})
 
     while True:
+        if parar is not None and parar.is_set():
+            break
         try:
             corpo = chamar(token, "getUpdates", {"offset": offset, "timeout": TIMEOUT})
         except TelegramError as exc:

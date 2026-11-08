@@ -442,3 +442,30 @@ curl -X POST http://localhost:8000/api/chat \
 Comandos rápidos reconhecidos sem IA: `status`, `produtos`, `pendentes`,
 `aprovar 1`, `rejeitar 1`, `pausar`, `retomar`, `modo`, `relatório`, `ajuda`.
 Qualquer outra frase vira um comando para o CEO AI.
+
+## Rodar sozinho, sem ninguém abrir painel (sem mim no meio)
+
+O agente conversa por conta própria quando existe um processo rodando. Neste
+repositório isso é um comando só, dentro de um container:
+
+```bash
+python -m scripts.run_agent --check     # valida token e dados
+python -m scripts.run_agent             # bot no ar (responde no Telegram)
+python -m scripts.run_agent --autonomy  # bot + ciclos autônomos
+```
+
+O mesmo processo roda em qualquer host com Docker:
+
+```bash
+docker build -t empire-agent .
+docker run -d --restart always -v empire-data:/data \
+  -e TELEGRAM_BOT_TOKEN=123:ABC -e TELEGRAM_ALLOWED_CHAT_IDS=seu_id empire-agent
+```
+
+Guias com opções gratuitas:
+- `deploy/huggingface/README.md` — Hugging Face Spaces (grátis, sem cartão)
+- `deploy/vm/README.md` — Oracle Cloud Always Free (grátis para sempre, VM ligada 24h)
+  com serviço systemd pronto em `deploy/vm/empire-agent.service`
+
+Compras, pagamentos e publicações continuam exigindo sua aprovação explícita. O
+processo pode rodar 24h sem que nada seja gasto sem você mandar.

@@ -428,10 +428,11 @@ const VIEWS = {
     const ligado = a.enabled && !a.paused;
     return `
       <h2>Super agente autônomo</h2>
-      <div class="hint">Ele roda o plano do CEO sozinho, grava relatório e para quando erra
-      demais. Comprar, pagar, publicar anúncio e alterar preço continuam exigindo sua aprovação.</div>
+      <div class="hint">Modo manual: ele roda o plano do CEO quando você aperta o botão, grava o
+      relatório e para. Nada roda sozinho. Comprar, pagar, publicar anúncio e alterar preço
+      continuam exigindo sua aprovação.</div>
       <div class="grid">
-        ${cardKpi("Estado", ligado ? "rodando" : (a.paused ? "pausado" : "desligado"),
+        ${cardKpi("Estado", a.enabled ? (ligado ? "rodando" : "pausado") : "manual (só no botão)",
                   a.pause_reason || "sem pausa")}
         ${cardKpi("Ciclos hoje", a.cycles_today ?? 0, "limite diário padrão: 8")}
         ${cardKpi("Ciclos no total", a.cycles_total ?? 0, "desde o início")}

@@ -106,7 +106,7 @@ class AutonomousSuperAgent:
         self.state["enabled"] = enabled
         if not enabled:
             self.state["paused"] = True
-            self.state["pause_reason"] = "desativado pelo proprietário"
+            self.state["pause_reason"] = "modo manual: roda só quando você pede"
         self._save_state()
         return self.status()
 
@@ -297,6 +297,8 @@ def main() -> int:
     grupo.add_argument("--status", action="store_true", help="mostra o estado")
     grupo.add_argument("--pause", action="store_true", help="pausa a autonomia")
     grupo.add_argument("--resume", action="store_true", help="reativa a autonomia")
+    grupo.add_argument("--disable", action="store_true",
+                       help="modo manual: só roda quando você pedir")
     parser.add_argument("--force", action="store_true", help="ignora guarda-corpos (manual)")
     parser.add_argument("--interval", type=int, default=1800, help="segundos entre ciclos")
     parser.add_argument("--max-cycles", type=int, default=None)
@@ -315,6 +317,10 @@ def main() -> int:
         return 0
     if args.resume:
         print(json.dumps(agente.resume(), ensure_ascii=False, indent=2, default=str))
+        return 0
+    if args.disable:
+        estado = agente.enable(False)
+        print(json.dumps(estado, ensure_ascii=False, indent=2, default=str))
         return 0
 
     agente.enable(True)

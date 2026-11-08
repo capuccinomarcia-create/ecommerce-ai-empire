@@ -9,28 +9,34 @@ from core.utils import local_now
 
 DEFAULT_AUTOMATIONS = [
     {
-        "name": "daily_product_research",
-        "schedule_cron": "0 8 * * *",
-        "job": "product_research",
-        "description": "Pesquisa e pontuação de produtos (diário, 08:00 America/Sao_Paulo).",
+        "name": "plano_de_venda",
+        "schedule_cron": "30 7 * * *",
+        "job": "sales_plan",
+        "description": "Plano de venda do dia: preço com margem alvo, estoque e anúncio (07:30).",
     },
     {
-        "name": "daily_performance_report",
-        "schedule_cron": "30 19 * * *",
-        "job": "daily_report",
-        "description": "Relatório diário de desempenho e alertas (19:30).",
+        "name": "alerta_de_estoque",
+        "schedule_cron": "0 12,18 * * *",
+        "job": "stock_alert",
+        "description": "Confere estoque contra o prazo do fornecedor e avisa o que repor (12:00 e 18:00).",
     },
     {
-        "name": "weekly_competitor_review",
-        "schedule_cron": "0 9 * * 1",
-        "job": "weekly_report",
-        "description": "Análise de concorrentes, margens e relatório financeiro (segunda, 09:00).",
+        "name": "revisao_de_preco",
+        "schedule_cron": "0 19 * * *",
+        "job": "price_review",
+        "description": "Aponta produto abaixo da margem alvo com o preço sugerido (19:00).",
     },
     {
-        "name": "weekly_content_planning",
+        "name": "checagem_de_anuncio",
         "schedule_cron": "0 10 * * 1",
-        "job": "content_planning",
-        "description": "Planejamento de conteúdo da semana (segunda, 10:00).",
+        "job": "listing_check",
+        "description": "Lista anúncios que ainda não podem ser publicados (segunda, 10:00).",
+    },
+    {
+        "name": "relatorio_diario",
+        "schedule_cron": "0 20 * * *",
+        "job": "daily_report",
+        "description": "Relatório do dia com vendas, margens e aprovações pendentes (20:00).",
     },
 ]
 

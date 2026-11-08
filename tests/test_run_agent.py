@@ -105,3 +105,36 @@ def test_main_recusa_subir_sem_token(monkeypatch, capsys):
     monkeypatch.delenv("TELEGRAM_BOT_TOKEN", raising=False)
     assert run_agent.main([]) == 2
     assert "TELEGRAM_BOT_TOKEN" in capsys.readouterr().err
+
+
+def test_supervisor_roda_o_agendador(monkeypatch):
+    monkeypatch.setattr(run_agent, "INTERVALO_AGENDA", 0.01)
+    ticks: list[str] = []
+
+    class FakeAgendador:
+        def tick(self, agora=None, forcar=None):
+            ticks.append("tick")
+            return [{"name": "plano_de_venda", "status": "ok", "summary": "ok"}]
+
+    def fake_bot(token, parar=None, agente=None):
+        while parar and not parar.is_set():
+            time.sleep(0.01)
+        return 0
+
+    supervisor = run_agent.Supervisor(rodar_bot_fn=fake_bot,
+                                      agente_factory=lambda: object(),
+                                      agendador_factory=FakeAgendador,
+                                      token="123:ABC", scheduler=True)
+    supervisor.start()
+    time.sleep(0.2)
+    supervisor.stop(timeout=5)
+    assert len(ticks) >= 2
+
+
+def test_supervisor_pode_ficar_sem_agendador():
+    supervisor = run_agent.Supervisor(rodar_bot_fn=lambda *a, **k: 0,
+                                      agente_factory=lambda: object(),
+                                      token="123:ABC", scheduler=False)
+    supervisor.start()
+    supervisor.stop(timeout=5)
+    assert [t.name for t in supervisor.threads] == ["bot"]

@@ -208,6 +208,17 @@ def collect_data() -> dict:
             }
             for a in agents
         ],
+        "rotinas": [
+            {
+                "name": r.get("name"),
+                "cron": r.get("schedule_cron"),
+                "job": r.get("job"),
+                "ativa": bool(r.get("enabled")),
+                "proxima": r.get("next_run_at"),
+                "descricao": (r.get("config") or {}).get("description", ""),
+            }
+            for r in (repo.find("automations", {}, order_by="name") or [])
+        ],
         "channels": channels,
         "viability": viability,
         "autonomia": autonomia,
@@ -663,6 +674,22 @@ const VIEWS = {
           <tr><td>Desligar</td><td><code>python -m scripts.bot_control stop</code></td></tr>
           <tr><td>Log do bot</td><td><code>python -m scripts.bot_control log --lines 40</code></td></tr>
         </tbody></table>
+      </div>
+
+      <div class="panel">
+        <div style="font-weight:700;margin-bottom:8px">Rotinas automáticas cadastradas</div>
+        ${(DATA.rotinas && DATA.rotinas.length) ? `
+        <table><thead><tr><th>Rotina</th><th>Quando</th><th>Próxima</th></tr></thead><tbody>
+          ${DATA.rotinas.map(r => `<tr>
+            <td><b>${esc(r.name)}</b><div class="muted" style="font-size:12px">${esc(r.descricao)}</div></td>
+            <td><code>${esc(r.cron||"")}</code></td>
+            <td>${esc((r.proxima||"—").replace("T"," ").slice(0,16))}</td>
+          </tr>`).join("")}
+        </tbody></table>
+        <p class="muted" style="margin:10px 0 0">Quem executa é o agendador dentro do processo
+        do bot: <code>python -m core.scheduler --loop</code> ou o próprio
+        <code>python -m scripts.run_agent</code>.</p>`
+        : `<p class="muted" style="margin:0">Nenhuma rotina cadastrada neste banco.</p>`}
       </div>
 
       <div class="panel">

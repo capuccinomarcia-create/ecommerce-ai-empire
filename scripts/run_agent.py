@@ -23,11 +23,13 @@ import time
 from typing import Any, Callable
 
 from core.autonomy import AutonomousSuperAgent
+from core.scheduler import Agendador
 from core.chat_agent import ChatAgent
 from database.repository import get_repository
 from scripts.telegram_bot import TelegramError, rodar as rodar_bot
 
 INTERVALO_CICLO = 300  # segundos entre checagens de "posso rodar um ciclo?"
+INTERVALO_AGENDA = 60  # segundos entre checagens de rotinas vencidas
 
 
 def check_ambiente(env: dict[str, str] | None = None) -> list[str]:
@@ -59,7 +61,9 @@ class Supervisor:
     def __init__(self, rodar_bot_fn: Callable[..., int] | None = None,
                  agente_factory: Callable[[], ChatAgent] | None = None,
                  autonomia_factory: Callable[[], AutonomousSuperAgent] | None = None,
-                 token: str | None = None, autonomy: bool = False) -> None:
+                 token: str | None = None, autonomy: bool = False,
+                 scheduler: bool = True,
+                 agendador_factory: Callable[[], Agendador] | None = None) -> None:
         self.parar = threading.Event()
         self.threads: list[threading.Thread] = []
         self.rodar_bot_fn = rodar_bot_fn or rodar_bot
@@ -67,6 +71,8 @@ class Supervisor:
         self.autonomia_factory = autonomia_factory or AutonomousSuperAgent
         self.token = token if token is not None else os.getenv("TELEGRAM_BOT_TOKEN", "")
         self.autonomy = autonomy
+        self.scheduler = scheduler
+        self.agendador_factory = agendador_factory or Agendador
         self.erros: list[str] = []
 
     def _bot(self) -> None:
@@ -89,10 +95,24 @@ class Supervisor:
         except Exception as exc:
             self.erros.append(f"autonomia: {exc}")
 
+    def _agenda(self) -> None:
+        try:
+            agendador = self.agendador_factory()
+            while not self.parar.is_set():
+                for item in agendador.tick():
+                    if item.get("status") != "ok":
+                        self.erros.append(f"rotina {item.get('name')}: {item.get('summary')}")
+                if self.parar.wait(INTERVALO_AGENDA):
+                    break
+        except Exception as exc:
+            self.erros.append(f"agendador: {exc}")
+
     def start(self) -> None:
         alvos = [("bot", self._bot)]
         if self.autonomy:
             alvos.append(("autonomia", self._autonomia))
+        if self.scheduler:
+            alvos.append(("agenda", self._agenda))
         for nome, alvo in alvos:
             thread = threading.Thread(target=alvo, name=nome, daemon=True)
             thread.start()
@@ -111,6 +131,8 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Mantém o super agente rodando sozinho")
     parser.add_argument("--check", action="store_true", help="só valida o ambiente e sai")
     parser.add_argument("--autonomy", action="store_true", help="liga também os ciclos autônomos")
+    parser.add_argument("--no-scheduler", action="store_true",
+                        help="não executa as rotinas automáticas de venda")
     args = parser.parse_args(argv)
 
     problemas = check_ambiente()
@@ -133,7 +155,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"erro: {problema}", file=sys.stderr)
         return 2
 
-    supervisor = Supervisor(autonomy=args.autonomy)
+    supervisor = Supervisor(autonomy=args.autonomy, scheduler=not args.no_scheduler)
 
     def encerrar(*_args: Any) -> None:
         print("encerrando...", flush=True)

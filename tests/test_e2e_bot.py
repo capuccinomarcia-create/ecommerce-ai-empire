@@ -88,3 +88,24 @@ class _Orquestrador:
                 "report": "Produto cadastrado e margem calculada.",
                 "steps": [{"agent": "ceo", "status": "concluida"}],
                 "pending_approvals": []}
+
+
+def test_comando_rotinas_responde_no_chat(repo):
+    from scripts.setup_rotinas import sincronizar
+
+    sincronizar(repo)
+    telegram = TelegramFalso(["rotinas"])
+    agente = ChatAgent(orchestrator=_Orquestrador(repo))
+    bot.rodar("token", allowlist={"42"}, uma_vez=True, agente=agente, chamar=telegram)
+    texto = " ".join(telegram.enviados)
+    assert "Rotinas automáticas" in texto
+    assert "plano_de_venda" in texto
+
+
+def test_cadastrar_rotinas_pelo_chat(repo):
+    telegram = TelegramFalso(["cadastrar rotinas"])
+    agente = ChatAgent(orchestrator=_Orquestrador(repo))
+    bot.rodar("token", allowlist={"42"}, uma_vez=True, agente=agente, chamar=telegram)
+    texto = " ".join(telegram.enviados)
+    assert "Rotinas de venda prontas" in texto
+    assert repo.count("automations") == 5

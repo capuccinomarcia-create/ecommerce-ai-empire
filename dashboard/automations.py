@@ -68,6 +68,15 @@ def render() -> None:
     if st.button("Verificar estado das automações"):
         st.session_state["auto"] = run_agent("automation", "overview",
                                              "Verificar rotinas e execuções", {})
+    if st.button("Executar rotinas vencidas agora"):
+        from core.scheduler import Agendador
+
+        resultados = Agendador(o.repo).tick()
+        if not resultados:
+            notice("warn", "Nada vencido neste minuto.")
+        for item in resultados:
+            st.success(f"{item['name']}: {item['summary']} ({item['duration_s']}s)")
+        st.rerun()
 
     automations = o.repo.find("automations", {}, order_by="name")
     for automation in automations:

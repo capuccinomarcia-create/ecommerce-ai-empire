@@ -491,3 +491,33 @@ No chat: `status`, `vendas`, `pendentes`, `aprovar 1`.
 Limite deliberado: o bot monta o rascunho do anúncio e opera os números, mas publicar,
 comprar ou pagar depende de aprovação sua e de credenciais do marketplace
 (`SHOPEE_PARTNER_ID`, `SHOPEE_PARTNER_KEY`, `SHOPEE_SHOP_ID` no `.env`, nunca no repo).
+
+
+## Tarefas automáticas (rotinas de venda)
+
+```
+python -m scripts.setup_rotinas            # cadastra as rotinas (idempotente)
+python -m scripts.setup_rotinas --listar   # mostra horários e próxima execução
+python -m core.scheduler --tick            # executa agora o que venceu
+python -m core.scheduler --loop            # fica de pé executando
+```
+
+Rotinas padrão (fuso America/Sao_Paulo):
+
+| Rotina | Quando | O que faz |
+|---|---|---|
+| plano_de_venda | 07:30 | preço com margem alvo, estoque mínimo e checklist do anúncio |
+| alerta_de_estoque | 12:00 e 18:00 | o que repor, com quantidade, pelo prazo do fornecedor |
+| revisao_de_preco | 19:00 | produto abaixo da meta, com o preço sugerido |
+| checagem_de_anuncio | segunda 10:00 | anúncios que ainda não podem ser publicados |
+| relatorio_diario | 20:00 | resumo do dia salvo no histórico |
+
+Quem executa é o processo do bot (`python -m scripts.run_agent` já sobe o agendador)
+ou o agendador isolado. No Telegram: `rotinas` mostra a agenda, `cadastrar rotinas`
+cria/reativa todas.
+
+O cron é interpretado no próprio projeto, sem dependência extra: `*`, listas
+(`12,18`), intervalos (`9-17`) e passos (`*/15`).
+
+Limite que continua valendo: rotina calcula, monta rascunho, registra pendência —
+publicar anúncio, comprar e pagar seguem exigindo aprovação sua.

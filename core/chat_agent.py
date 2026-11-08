@@ -35,6 +35,7 @@ AJUDA = """Comandos que eu executo:
 
 *Operação*
 • status — como está a operação agora
+• rotinas — o que roda sozinho e quando
 • vendas — plano de venda: preço, estoque e anúncio
 • produtos — catálogo com margem calculada
 • relatório — último relatório do CEO
@@ -218,6 +219,28 @@ class ChatAgent:
             )
         return Resposta("\n".join(linhas), kind="lista", data=produtos)
 
+
+    def _rotinas(self) -> Resposta:
+        from core.scheduler import Agendador
+
+        agendador = Agendador(self.orchestrator.repo)
+        rotinas = agendador.rotinas()
+        filtro = getattr(self.orchestrator, "agent_filter", None)
+        if filtro:
+            rotinas = [r for r in rotinas if filtro in str(r.get("job") or "")]
+        if not rotinas:
+            return Resposta(
+                "Nenhuma rotina cadastrada. Diga \"cadastrar rotinas\" que eu crio as de venda.",
+                kind="texto", data={"automations": []},
+            )
+        linhas = ["*Rotinas automáticas*", ""]
+        for rotina in rotinas:
+            estado = "ativa" if rotina.get("enabled") else "pausada"
+            linhas.append(f"• {rotina.get('name')} · {rotina.get('schedule_cron')} · {estado}"
+                          f" · próxima: {rotina.get('next_run_at') or '—'}")
+        linhas += ["", "Tudo isso roda no agendador; publicar e pagar seguem com aprovação."]
+        return Resposta("\n".join(linhas), kind="lista", data={"automations": rotinas})
+
     def _relatorio(self) -> Resposta:
         ultimo = self.orchestrator.repo.find("reports", {}, order_by="-created_at", limit=1)
         if not ultimo:
@@ -263,6 +286,22 @@ class ChatAgent:
 
             plano = SalesOperator(self.orchestrator.repo).plano()
             return Resposta(resumo_texto(plano), kind="lista", data=plano)
+
+        if baixo in {"cadastrar rotinas", "criar rotinas", "configurar rotinas",
+                     "ativar rotinas", "tarefas automaticas de venda"}:
+            from scripts.setup_rotinas import sincronizar
+
+            resultado = sincronizar(self.orchestrator.repo, ativar=True)
+            return Resposta(
+                f"Rotinas de venda prontas: {len(resultado['criadas'])} criadas, "
+                f"{len(resultado['atualizadas'])} atualizadas, {resultado['total']} no total. "
+                "Diga \"rotinas\" para ver quando cada uma roda.",
+                kind="texto", data=resultado,
+            )
+
+        if baixo in {"rotinas", "automacoes", "automações", "/rotinas",
+                     "tarefas automaticas", "tarefas automáticas"}:
+            return self._rotinas()
 
         if baixo in {"relatorio", "relatório", "/relatorio", "ultimo relatorio"}:
             return self._relatorio()

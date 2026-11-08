@@ -173,10 +173,29 @@ def import_csv(
                 if key in mapped:
                     criteria[key] = mapped.pop(key)
             if criteria:
-                mapped["breakdown"] = {
-                    "criteria": criteria,
-                    "sources": {key: f"CSV ({source})" for key in criteria},
-                }
+                sources = {key: f"CSV ({source})" for key in criteria}
+                mapped["breakdown"] = {"criteria": criteria, "sources": sources}
+                # nota calculada no momento da importação (determinística, com confiança)
+                try:
+                    from analytics.product_score import score_product
+
+                    op = score_product(
+                        name=mapped.get("name", ""),
+                        criteria={
+                            "demanda": criteria.get("demanda"),
+                            "concorrencia": criteria.get("concorrencia"),
+                            "tendencia": criteria.get("tendencia"),
+                            "logistica": criteria.get("logistica"),
+                            "trafego": criteria.get("trafego"),
+                        },
+                        sources=sources,
+                    )
+                    mapped["score"] = op.score
+                    mapped["recommendation"] = op.classification_label
+                    mapped["breakdown"]["explanation"] = op.explanations
+                    mapped["breakdown"]["confidence"] = round(op.confidence, 2)
+                except Exception:  # noqa: BLE001 - importar não pode falhar por causa da nota
+                    pass
         if entity == "competitors":
             mapped.setdefault("collected_at", now_iso())
             mapped.setdefault("source", source)

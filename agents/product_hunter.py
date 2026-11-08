@@ -6,7 +6,7 @@ from typing import Any
 
 from agents.base import AgentContext, AgentResult, BaseAgent, MarketContext
 from analytics.product_score import ScoreInput, score_product
-from core.utils import pct
+from core.utils import now_iso, pct
 
 
 class ProductHunterAgent(BaseAgent):
@@ -96,6 +96,25 @@ class ProductHunterAgent(BaseAgent):
                     sources=sources,
                 )
             )
+            persisted = {
+                "score": score.score,
+                "recommendation": score.classification_label,
+                "margin_estimate": margin_pct,
+                "consulted_at": now_iso(),
+                "breakdown": {
+                    **(candidate.get("breakdown") or {}),
+                    "criteria": criteria,
+                    "sources": sources,
+                    "explanation": score.explanations,
+                    "confidence": round(score.confidence, 2),
+                },
+            }
+            if hasattr(self.ctx, "repo") and self.ctx.repo is not None:
+                try:
+                    self.ctx.repo.update("opportunities", candidate["id"], persisted)
+                except Exception:  # noqa: BLE001 - persistir é melhor-esforço, não bloqueia
+                    pass
+
             scored.append(
                 {
                     "name": name,

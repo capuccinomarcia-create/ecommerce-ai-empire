@@ -452,7 +452,7 @@ const VIEWS = {
         <div style="margin-bottom:14px">
           <label for="preset">Canal de venda</label>
           <select id="preset" onchange="aplicarPreset()">
-            <option value="">Preencher manualmente</option>
+            <option value="" selected>Preencher manualmente</option>
             ${presets}
           </select>
         </div>

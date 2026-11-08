@@ -292,6 +292,7 @@ create table if not exists ai_usage (
 );
 
 create table if not exists settings_kv (
+  id uuid default gen_random_uuid(),
   key text primary key,
   value jsonb not null,
   updated_at timestamptz not null default now()

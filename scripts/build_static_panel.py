@@ -161,6 +161,25 @@ def collect_data() -> dict:
             }
         )
 
+    estado_autonomia = repo.get_setting("autonomy_state", {}) or {}
+    ultimo_relatorio = repo.find("reports", {}, order_by="-created_at", limit=1)
+    autonomia = {
+        "enabled": bool(estado_autonomia.get("enabled")),
+        "paused": bool(estado_autonomia.get("paused")),
+        "pause_reason": estado_autonomia.get("pause_reason"),
+        "cycles_today": int(estado_autonomia.get("cycles_today", 0) or 0),
+        "cycles_total": int(estado_autonomia.get("cycles_total", 0) or 0),
+        "last_status": estado_autonomia.get("last_status"),
+        "last_cycle_at": estado_autonomia.get("last_cycle_at"),
+        "last_summary": estado_autonomia.get("last_summary"),
+        "consecutive_failures": int(estado_autonomia.get("consecutive_failures", 0) or 0),
+        "ultimo_relatorio": (
+            {"titulo": ultimo_relatorio[0].get("title"),
+             "quando": ultimo_relatorio[0].get("created_at")}
+            if ultimo_relatorio else None
+        ),
+    }
+
     return {
         "generated_at": datetime.now(TZ).strftime("%d/%m/%Y %H:%M"),
         "timezone": settings.timezone,
@@ -187,6 +206,7 @@ def collect_data() -> dict:
         ],
         "channels": channels,
         "viability": viability,
+        "autonomia": autonomia,
         "marketplaces": [
             {"slug": m.get("slug"), "name": m.get("name"),
              "commission_pct": m.get("commission_pct"), "fixed_fee": m.get("fixed_fee"),
@@ -343,6 +363,7 @@ if (typeof module !== "undefined") module.exports = {calcular};
 /* ---------- páginas ---------- */
 const PAGES = [
   ["home", "Visão geral"],
+  ["agente", "Super agente"],
   ["products", "Produtos"],
   ["opps", "Oportunidades"],
   ["prazos", "Prazos e fornecedores"],
@@ -399,6 +420,41 @@ const VIEWS = {
           <td class="num">${pct(o.margin_estimate)}</td></tr>`).join("")}
         ${DATA.opportunities.length ? "" : `<tr><td colspan="5">Nenhuma oportunidade importada.</td></tr>`}
         </tbody></table>
+      </section>`;
+  },
+
+  agente(){
+    const a = DATA.autonomia || {};
+    const ligado = a.enabled && !a.paused;
+    return `
+      <h2>Super agente autônomo</h2>
+      <div class="hint">Ele roda o plano do CEO sozinho, grava relatório e para quando erra
+      demais. Comprar, pagar, publicar anúncio e alterar preço continuam exigindo sua aprovação.</div>
+      <div class="grid">
+        ${cardKpi("Estado", ligado ? "rodando" : (a.paused ? "pausado" : "desligado"),
+                  a.pause_reason || "sem pausa")}
+        ${cardKpi("Ciclos hoje", a.cycles_today ?? 0, "limite diário padrão: 8")}
+        ${cardKpi("Ciclos no total", a.cycles_total ?? 0, "desde o início")}
+        ${cardKpi("Falhas seguidas", a.consecutive_failures ?? 0, "2 pausam sozinho")}
+      </div>
+      <section class="panel">
+        <h3 style="margin:0 0 8px;font-size:16px">Último ciclo</h3>
+        <div style="font-size:13px;color:#64748b;margin-bottom:8px">
+          ${a.last_cycle_at ? esc(String(a.last_cycle_at).slice(0,16).replace("T"," ")) : "nunca rodou"}
+          ${a.last_status ? " · " + esc(a.last_status) : ""}
+        </div>
+        <pre style="white-space:pre-wrap;font-size:12.5px;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:12px;max-height:460px;overflow:auto;margin:0">${esc(a.last_summary || "Nenhum ciclo registrado ainda.")}</pre>
+      </section>
+      <section class="panel">
+        <h3 style="margin:0 0 8px;font-size:16px">O que ele faz sozinho e o que não faz</h3>
+        <table><thead><tr><th>Faz sozinho</th><th>Só com sua aprovação</th></tr></thead><tbody>
+          <tr><td>Pesquisar produto, calcular margem, checar se o fornecedor entrega no prazo,
+                  comparar concorrente, escrever título, descrição e roteiro, montar relatório.</td>
+              <td>Comprar, pagar, publicar anúncio, mudar preço, excluir produto,
+                  mandar mensagem em massa, mexer em campanha.</td></tr>
+        </tbody></table>
+        <div class="note" style="margin-top:12px">Para rodar sem ninguém abrir o painel:
+        <code>python -m core.autonomy --loop</code>. Sem esse processo ativo, ele só roda no botão.</div>
       </section>`;
   },
 

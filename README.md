@@ -345,3 +345,33 @@ antes de recomendar um produto.
 
 Retirada no mesmo dia (`same_day_pickup=sim`) conta como despacho no dia 0.
 O cálculo usa dias úteis e ignora feriados (o sistema não inventa calendário).
+
+## Super agente autônomo
+
+O agente que roda sozinho, com limites claros:
+
+```bash
+python -m core.autonomy --status     # como ele está agora
+python -m core.autonomy --once       # um ciclo agora
+python -m core.autonomy --loop       # roda continuamente (30 min por ciclo)
+python -m core.autonomy --pause      # pausa
+python -m core.autonomy --resume     # retoma
+```
+
+Guardas que ele respeita: janela de horário (7h-23h), máximo de 8 ciclos por dia,
+intervalo mínimo entre ciclos, cooldown maior depois de falha, pausa automática
+após 2 falhas seguidas e bloqueio quando há 25 aprovações pendentes. O estado fica
+no banco: reiniciar não zera o histórico.
+
+**O que ele faz sozinho:** pesquisa produto, calcula margem, confere prazo de
+fornecedor, compara concorrente, escreve título, descrição e roteiro, e grava relatório.
+
+**O que ele nunca faz sem você:** comprar, pagar, publicar anúncio, mudar preço,
+excluir produto, mandar mensagem em massa e alterar campanha. Essas ações caem na
+fila de aprovação.
+
+Para 24 horas por dia ele precisa de um processo rodando. Opções gratuitas: seu
+computador ligado, uma VM gratuita (Oracle Cloud Free Tier) ou um serviço de
+container com plano free. Streamlit Community Cloud e GitHub Actions não servem
+para processo contínuo (o primeiro dorme, o segundo tem limite de minutos e não
+guarda o banco).

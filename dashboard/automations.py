@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import streamlit as st
 
+from core.autonomy import AutonomousSuperAgent
 from dashboard.common import notice, orch, page_header, render_result, run_agent, table
 
 
@@ -11,6 +12,56 @@ def render() -> None:
     o = orch()
     page_header("Automações", "Rotinas diárias e semanais, execuções recentes e falhas.")
 
+
+    # ---------------------------------------------------- super agente autônomo --
+    st.subheader("Super agente autônomo")
+    st.caption("Ele acorda sozinho, roda o plano do CEO, grava relatório e para "
+               "quando erra demais. Comprar, pagar e publicar continuam com você.")
+    agente = AutonomousSuperAgent(orchestrator=o)
+    estado = agente.status()
+
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Ciclos hoje", f"{estado['cycles_today']}/{estado['limites']['ciclos_por_dia']}")
+    c2.metric("Ciclos no total", estado["cycles_total"])
+    c3.metric("Aprovações pendentes", estado["aprovacoes_pendentes"])
+    c4.metric("Último status", estado.get("last_status") or "nunca rodou")
+    st.caption(f"Próximo objetivo: {estado['proximo_objetivo']}")
+    if estado["pode_rodar_agora"]:
+        notice("ok", "Pronto para rodar.")
+    else:
+        notice("warn", f"Não vai rodar agora: {estado['motivo']}")
+    if estado.get("last_summary"):
+        with st.expander("Resumo do último ciclo"):
+            st.write(estado["last_summary"])
+
+    b1, b2, b3, b4 = st.columns(4)
+    if b1.button("Rodar um ciclo agora", type="primary", width="stretch"):
+        with st.spinner("Executando o plano do CEO..."):
+            ciclo = agente.run_cycle(force=True)
+        if ciclo.get("ok"):
+            st.success(f"Ciclo concluído em {ciclo.get('duration_s')}s.")
+            st.write(ciclo.get("resumo", "")[:1500])
+        elif ciclo.get("skipped"):
+            notice("warn", f"Não rodou: {ciclo.get('reason')}")
+        else:
+            st.error(f"Falhou: {ciclo.get('error')}")
+        st.rerun()
+    rotulo = "Desativar" if estado["enabled"] else "Ativar autonomia"
+    if b2.button(rotulo, width="stretch"):
+        agente.enable(not estado["enabled"])
+        st.rerun()
+    if b3.button("Pausar", width="stretch", disabled=estado["paused"]):
+        agente.pause("pausado pelo painel")
+        st.rerun()
+    if b4.button("Retomar", width="stretch", disabled=not estado["paused"]):
+        agente.resume()
+        st.rerun()
+
+    notice("info", "Para rodar 24 horas sem o painel aberto, use no computador ou servidor: "
+                   "`python -m core.autonomy --loop`. Sem esse processo, o agente só roda "
+                   "no botão acima.")
+
+    st.divider()
     if st.button("Cadastrar rotinas padrão", type="primary"):
         st.session_state["auto"] = run_agent("automation", "register_defaults",
                                              "Cadastrar rotinas padrão", {})

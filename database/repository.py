@@ -190,7 +190,7 @@ CREATE TABLE IF NOT EXISTS ai_usage (
 );
 
 CREATE TABLE IF NOT EXISTS settings_kv (
-  key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT NOT NULL
+  id TEXT, key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT NOT NULL
 );
 """
 
@@ -248,6 +248,9 @@ class SQLiteRepository:
             "same_day_pickup": "INTEGER NOT NULL DEFAULT 0",
             "city": "TEXT",
             "state": "TEXT",
+        },
+        "settings_kv": {
+            "id": "TEXT",
         },
         "marketplaces": {
             "handling_days": "INTEGER NOT NULL DEFAULT 0",

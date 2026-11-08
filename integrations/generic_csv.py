@@ -33,7 +33,8 @@ TEMPLATES: dict[str, dict[str, list[str]]] = {
     },
     "suppliers": {
         "required": ["name", "unit_price"],
-        "optional": ["contact", "url", "min_qty", "lead_time_days", "shipping_cost", "notes"],
+        "optional": ["contact", "url", "min_qty", "lead_time_days", "shipping_cost", "notes",
+                     "pickup_available", "same_day_pickup", "city", "state"],
         "aliases": {
             "fornecedor": "name", "nome": "name", "contato": "contact", "link": "url",
             "quantidade_minima": "min_qty", "prazo_dias": "lead_time_days",
@@ -68,6 +69,15 @@ NUMERIC_FIELDS = {
     "taxes", "price_found", "cost_estimate", "demanda", "concorrencia", "tendencia",
     "logistica", "trafego",
 }
+
+
+BOOLEAN_FIELDS = {"pickup_available", "same_day_pickup", "is_demo"}
+
+_TRUE = {"1", "true", "sim", "s", "yes", "y", "verdadeiro"}
+
+
+def _parse_bool(value: str) -> bool:
+    return (value or "").strip().lower() in _TRUE
 
 
 def _normalize_header(header: str) -> str:
@@ -116,6 +126,9 @@ def map_row(row: dict[str, str], entity: str) -> dict[str, Any]:
             continue
         value = str(value).strip()
         if value == "":
+            continue
+        if key in BOOLEAN_FIELDS:
+            mapped[key] = _parse_bool(value)
             continue
         if key in NUMERIC_FIELDS:
             number = _parse_number(value)

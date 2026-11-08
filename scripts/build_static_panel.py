@@ -126,6 +126,27 @@ def collect_data() -> dict:
         if "net_profit_per_unit" in fin:
             profit_sum += fin["net_profit_per_unit"] or 0
 
+    # viabilidade de entrega: prazo do canal x prazo de cada fornecedor
+    from analytics.fulfillment import deadline_from_marketplace, rank_suppliers
+
+    viability = []
+    for m in marketplaces:
+        prazo = deadline_from_marketplace(m)
+        ranking = rank_suppliers(suppliers, prazo, None)
+        viability.append(
+            {
+                "channel": prazo.slug,
+                "channel_name": prazo.name,
+                "handling_days": prazo.handling_days,
+                "delivery_days": prazo.delivery_days,
+                "informed": prazo.informado,
+                "source": prazo.source,
+                "ranking": [v.to_dict() for v in ranking],
+            }
+        )
+    viability_order = {v["channel"]: i for i, v in enumerate(viability)}
+    viability.sort(key=lambda v: (not v["informed"], v["channel_name"]))
+
     channels = []
     for slug, label in CHANNEL_LABELS.items():
         rule = rules.get(slug, {})
@@ -165,6 +186,7 @@ def collect_data() -> dict:
             for a in agents
         ],
         "channels": channels,
+        "viability": viability,
         "marketplaces": [
             {"slug": m.get("slug"), "name": m.get("name"),
              "commission_pct": m.get("commission_pct"), "fixed_fee": m.get("fixed_fee"),
@@ -323,6 +345,7 @@ const PAGES = [
   ["home", "Visão geral"],
   ["products", "Produtos"],
   ["opps", "Oportunidades"],
+  ["prazos", "Prazos e fornecedores"],
   ["calc", "Calculadora financeira"],
   ["agents", "Central de agentes"],
   ["channels", "Conexões"],
@@ -436,6 +459,55 @@ const VIEWS = {
               </div>`;
             }).join("")}
           </div>`).join("") || "<div>Sem oportunidades para detalhar.</div>"}
+      </section>`;
+  },
+
+  prazos(){
+    const v = DATA.viability || [];
+    const tagV = t => {
+      if (t === "pode vender hoje") return `<span class="tag ok">${esc(t)}</span>`;
+      if (t === "vende no limite") return `<span class="tag mid">${esc(t)}</span>`;
+      if (t === "vende com risco") return `<span class="tag mid">${esc(t)}</span>`;
+      if (t === "perde o prazo") return `<span class="tag bad">${esc(t)}</span>`;
+      return `<span class="tag off">${esc(t)}</span>`;
+    };
+    return `
+      <h2>Prazos e fornecedores</h2>
+      <div class="hint">Atraso no despacho derruba o anúncio no ranking e queima o tráfego.
+      Aqui cada fornecedor é comparado com o prazo de despacho do canal. Os prazos abaixo são
+      valores carregados na configuração do sistema (marcados quando são DEMO).</div>
+      ${v.length ? "" : `<div class="note">Nenhum canal configurado.</div>`}
+      ${v.map(c => `
+        <section class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap">
+            <h3 style="margin:0;font-size:16px">${esc(c.channel_name)}</h3>
+            <span style="font-size:12.5px;color:#64748b">
+              ${c.informed ? `despachar em até <b>${c.handling_days}</b> dia(s) útil(eis) · entrega ${c.delivery_days} dia(s)` : `<span class="tag bad">prazo não informado</span>`}
+            </span>
+          </div>
+          <div style="font-size:12px;color:#94a3b8;margin:4px 0 10px">fonte: ${esc(c.source || "não informado")}</div>
+          <table><thead><tr><th>Fornecedor</th><th>Veredito</th><th>Despacha em</th>
+            <th class="num">Dias úteis</th><th class="num">Folga</th><th>Modo</th>
+            <th class="num">Custo/un</th></tr></thead><tbody>
+          ${c.ranking.map(r => `<tr>
+            <td style="font-weight:600">${esc(r.supplier)}</td>
+            <td>${tagV(r.verdict)}</td>
+            <td>${esc((r.dispatch_date||"").split("-").reverse().join("/"))}</td>
+            <td class="num">${r.days_to_dispatch}</td>
+            <td class="num">${r.slack_days === null ? "—" : r.slack_days}</td>
+            <td style="font-size:12.5px">${esc(r.mode)}</td>
+            <td class="num">${brl(r.landed_unit_cost)}</td></tr>`).join("") ||
+            `<tr><td colspan="7">Nenhum fornecedor cadastrado.</td></tr>`}
+          </tbody></table>
+        </section>`).join("")}
+      <section class="panel">
+        <h3 style="margin:0 0 8px;font-size:16px">Como usar isso</h3>
+        <div style="font-size:13.5px;color:#334155">
+          Só publique um produto cujo fornecedor apareça como <b>pode vender hoje</b>.
+          Se o melhor aparecer como <b>vende no limite</b>, tenha estoque já na mão antes de subir
+          o anúncio. Se aparecer <b>perde o prazo</b>, ou você acha outro fornecedor, ou usa
+          retirada no mesmo dia, ou não vende esse produto nesse canal.
+        </div>
       </section>`;
   },
 

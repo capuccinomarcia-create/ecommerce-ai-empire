@@ -42,7 +42,7 @@ JSON_COLUMNS: dict[str, set[str]] = {
     "settings_kv": {"value"},
 }
 
-BOOL_COLUMNS: set[str] = {"is_demo", "enabled", "ok"}
+BOOL_COLUMNS: set[str] = {"is_demo", "enabled", "ok", "pickup_available", "same_day_pickup"}
 
 SQLITE_SCHEMA = """
 CREATE TABLE IF NOT EXISTS users (
@@ -112,6 +112,9 @@ CREATE TABLE IF NOT EXISTS suppliers (
   min_qty INTEGER NOT NULL DEFAULT 1, unit_price REAL NOT NULL DEFAULT 0,
   lead_time_days INTEGER NOT NULL DEFAULT 0,
   shipping_cost REAL NOT NULL DEFAULT 0, notes TEXT, risk_notes TEXT,
+  pickup_available INTEGER NOT NULL DEFAULT 0,
+  same_day_pickup INTEGER NOT NULL DEFAULT 0,
+  city TEXT, state TEXT,
   is_demo INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL
 );
 
@@ -141,7 +144,9 @@ CREATE TABLE IF NOT EXISTS listings (
 CREATE TABLE IF NOT EXISTS marketplaces (
   id TEXT PRIMARY KEY, slug TEXT UNIQUE NOT NULL, name TEXT NOT NULL,
   commission_pct REAL NOT NULL DEFAULT 0, fixed_fee REAL NOT NULL DEFAULT 0,
-  notes TEXT, source TEXT, updated_at TEXT NOT NULL
+  handling_days INTEGER NOT NULL DEFAULT 0,
+  delivery_days INTEGER NOT NULL DEFAULT 0,
+  notes TEXT, source TEXT, sla_source TEXT, updated_at TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS costs (
@@ -233,6 +238,34 @@ class SQLiteRepository:
             self._conn.executescript(SQLITE_SCHEMA)
             self._conn.commit()
         self._columns.clear()
+        self._migrate_columns()
+
+    # colunas adicionadas depois da primeira versão do banco. Sem isso, quem já
+    # tinha o arquivo .db criado não receberia os campos novos.
+    _NEW_COLUMNS: dict[str, dict[str, str]] = {
+        "suppliers": {
+            "pickup_available": "INTEGER NOT NULL DEFAULT 0",
+            "same_day_pickup": "INTEGER NOT NULL DEFAULT 0",
+            "city": "TEXT",
+            "state": "TEXT",
+        },
+        "marketplaces": {
+            "handling_days": "INTEGER NOT NULL DEFAULT 0",
+            "delivery_days": "INTEGER NOT NULL DEFAULT 0",
+            "sla_source": "TEXT",
+        },
+    }
+
+    def _migrate_columns(self) -> None:
+        with self._lock:
+            for table, cols in self._NEW_COLUMNS.items():
+                existentes = self.columns(table)
+                for col, ddl in cols.items():
+                    if col in existentes:
+                        continue
+                    self._conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {ddl}")
+                    self._conn.commit()
+                    self._columns.pop(table, None)
 
     def columns(self, table: str) -> set[str]:
         table = self._table(table)

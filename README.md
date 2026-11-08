@@ -328,3 +328,20 @@ simples, tem busca pública) e ligar o Supabase para manter histórico no Action
 ## 19. Licença
 
 MIT — use, modifique e venda o que construir com isso.
+
+## Prazo de entrega (não perder tráfego)
+
+Vender e não despachar no prazo da plataforma derruba o anúncio no ranking.
+Por isso o sistema cruza o **prazo do canal** com o **prazo de cada fornecedor**
+antes de recomendar um produto.
+
+1. Abra a página do canal (Shopee, Mercado Livre, TikTok Shop...) e salve
+   "Dias úteis para despachar" e "Dias úteis de entrega". O sistema não chuta
+   esses números: sem eles o veredito é `indefinido`.
+2. Em **Fornecedores**, importe o CSV com `lead_time_days`, `pickup_available`,
+   `same_day_pickup`, `city` e `shipping_cost`.
+3. O veredito por fornecedor é: `pode vender hoje`, `vende no limite`,
+   `vende com risco`, `perde o prazo` ou `indefinido`.
+
+Retirada no mesmo dia (`same_day_pickup=sim`) conta como despacho no dia 0.
+O cálculo usa dias úteis e ignora feriados (o sistema não inventa calendário).

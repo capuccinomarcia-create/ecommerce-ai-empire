@@ -6,6 +6,7 @@ import streamlit as st
 
 from dashboard.common import (csv_import_widget, demo_badge, money_brl, notice, orch,
                               page_header, render_result, run_agent, table)
+from core.utils import now_iso
 from integrations import APIError, NotConfigured, build_connector, label_for
 
 CHANNEL_HELP = {
@@ -70,6 +71,41 @@ def render_channel(channel: str) -> None:
             result_data = st.session_state[key].get("result", {}).get("data", {})
             if result_data.get("draft"):
                 st.json(result_data["draft"].get("payload_preview", result_data["draft"]))
+
+    st.divider()
+    st.subheader("Prazo desta plataforma")
+    st.caption(
+        "É esse prazo que decide se o fornecedor entrega sem derrubar o anúncio. "
+        "O sistema não chuta o número: informe a política vigente do canal."
+    )
+    regra = o.repo.find_one("marketplaces", {"slug": channel}) or {}
+    with st.form(f"sla_form_{channel}"):
+        c1, c2, c3 = st.columns(3)
+        handling = c1.number_input("Dias úteis para despachar", 0, 60,
+                                   int(regra.get("handling_days") or 0), key=f"hd_{channel}")
+        delivery = c2.number_input("Dias úteis de entrega ao cliente", 0, 120,
+                                   int(regra.get("delivery_days") or 0), key=f"dd_{channel}")
+        fonte = c3.text_input("Fonte do prazo", regra.get("sla_source") or "",
+                              key=f"src_{channel}")
+        if st.form_submit_button("Salvar prazo", type="primary"):
+            dados = {
+                "handling_days": int(handling),
+                "delivery_days": int(delivery),
+                "sla_source": fonte or "não informado pelo proprietário",
+                "updated_at": now_iso(),
+            }
+            if regra.get("id"):
+                o.repo.update("marketplaces", regra["id"], dados)
+            else:
+                o.repo.insert("marketplaces", {"slug": channel, "name": label_for(channel),
+                                               "commission_pct": 0.0, "fixed_fee": 0.0,
+                                               "notes": "Criado ao salvar o prazo.",
+                                               "source": "proprietário", **dados})
+            st.success("Prazo salvo. A análise de fornecedores já usa esse número.")
+            st.rerun()
+    if int(regra.get("handling_days") or 0) == 0:
+        notice("warn", "**Prazo não informado.** Sem ele, o sistema não afirma que "
+                       "um fornecedor entrega a tempo.")
 
     st.divider()
     st.subheader("Anúncios neste canal")

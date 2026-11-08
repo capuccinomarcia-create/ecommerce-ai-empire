@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from agents.base import AgentContext, AgentResult, BaseAgent
+from analytics.fulfillment import deadline_from_marketplace, rank_suppliers
 from core.utils import money
 
 
@@ -83,15 +84,58 @@ class SupplierHunterAgent(BaseAgent):
                 f"({diff:+.1f}% vs melhor), prazo {row['lead_time_days']} dias."
             )
         risks = [f"{r['name']}: {risk}" for r in rows for risk in r["risks"]]
+
+        # --- quem consegue despachar dentro do prazo de cada canal ---
+        viability: list[dict[str, Any]] = []
+        prazos_pendentes: list[str] = []
+        channel = str(payload.get("channel") or payload.get("marketplace") or "").strip()
+        regras = self.ctx.repo.find("marketplaces", {}, order_by="name")
+        if channel:
+            regras = [r for r in regras if r.get("slug") == channel]
+        for regra in regras:
+            prazo = deadline_from_marketplace(regra)
+            ranking = rank_suppliers(suppliers, prazo, quantity or None)
+            viability.append(
+                {
+                    "channel": prazo.slug,
+                    "channel_name": prazo.name,
+                    "handling_days": prazo.handling_days,
+                    "delivery_days": prazo.delivery_days,
+                    "deadline_informed": prazo.informado,
+                    "source": prazo.source,
+                    "ranking": [v.to_dict() for v in ranking],
+                }
+            )
+            if not prazo.informado:
+                prazos_pendentes.append(
+                    f"Informe o prazo de despacho da {prazo.name} em "
+                    "Configurações > Marketplaces para saber quem entrega no prazo."
+                )
+                continue
+            dentro = [v for v in ranking if v.on_time]
+            if dentro:
+                melhor = dentro[0]
+                findings.append(
+                    f"{prazo.name}: {len(dentro)} fornecedor(es) despacham dentro de "
+                    f"{prazo.handling_days} dia(s) útil(eis). Melhor: {melhor.supplier} "
+                    f"({melhor.mode}) a {money(melhor.landed_unit_cost)}/unidade."
+                )
+            else:
+                findings.append(
+                    f"{prazo.name}: nenhum fornecedor cumpre o prazo de "
+                    f"{prazo.handling_days} dia(s) útil(eis). Vender agora derruba o anúncio."
+                )
+
         narrative, provider = self.narrate(
             f"Comparação de {len(rows)} fornecedores.", findings + risks[:3]
         )
         return AgentResult(
             summary=f"{len(rows)} fornecedores comparados; melhor custo unitário: {money(best['unit_total_cost'])}.",
-            data={"suppliers": rows, "demo_mode": any(r["is_demo"] for r in rows)},
+            data={"suppliers": rows, "viability": viability,
+                  "demo_mode": any(r["is_demo"] for r in rows)},
             findings=findings,
             warnings=risks[:10],
-            data_gaps=[
+            data_gaps=prazos_pendentes + [
                 "Preços de fornecedor mudam: reconfirme antes de comprar.",
                 "Nenhuma compra é feita por este agente; a decisão é sempre sua.",
             ],

@@ -32,6 +32,37 @@ def clear_demo(repo) -> int:
     return removed
 
 
+DEMO_SLA = {
+    # Valores de demonstração. NÃO são a política oficial de cada canal:
+    # substitua pelos números vigentes em Configurações > Marketplaces.
+    "shopee": (3, 7),
+    "mercadolivre": (2, 5),
+    "tiktok_shop": (2, 7),
+    "instagram": (3, 10),
+    "woocommerce": (2, 7),
+}
+
+
+def apply_demo_sla(repo) -> int:
+    """Grava prazos DEMO nos canais, deixando a origem explícita."""
+    alterados = 0
+    for slug, (handling, delivery) in DEMO_SLA.items():
+        row = repo.find_one("marketplaces", {"slug": slug})
+        if not row:
+            continue
+        repo.update(
+            "marketplaces",
+            row["id"],
+            {
+                "handling_days": handling,
+                "delivery_days": delivery,
+                "sla_source": "DEMO - substitua pela política vigente do canal",
+            },
+        )
+        alterados += 1
+    return alterados
+
+
 def seed_demo(repo, clear_first: bool = False) -> dict:
     if clear_first:
         clear_demo(repo)
@@ -43,6 +74,7 @@ def seed_demo(repo, clear_first: bool = False) -> dict:
             continue
         result = import_csv(path, entity, repo, is_demo=True, source="DEMO")
         report[entity] = {k: v for k, v in result.items() if k != "rows"}
+    report["marketplace_sla"] = {"updated": apply_demo_sla(repo)}
     return report
 
 

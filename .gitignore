@@ -35,3 +35,7 @@ imports/*.csv
 # SO
 .DS_Store
 Thumbs.db
+
+# banco local (não versionar)
+data/empire.db
+data/empire.db-*

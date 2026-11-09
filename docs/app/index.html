@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1120">
+<title>E-COMMERCE AI EMPIRE</title>
+<style>
+:root{
+  --bg:#0b1120; --bg2:#0e1729; --card:#111c33; --line:#1e293b; --line2:#16213a;
+  --tx:#e5e9f0; --mut:#8b98ad; --mut2:#64748b; --ok:#4ade80; --warn:#fbbf24; --err:#f87171; --acc:#38bdf8;
+  --r:12px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:18px 16px 70px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:14px}
+.brand{display:flex;align-items:baseline;gap:8px}
+.brand h1{font-size:18px;margin:0;letter-spacing:.02em}
+.brand b{color:var(--acc);font-weight:700}
+.brand .tag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut2);border:1px solid var(--line);padding:2px 7px;border-radius:999px}
+.meta{font-size:12px;color:var(--mut);display:flex;gap:14px;flex-wrap:wrap}
+.meta span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(74,222,128,.15)}
+nav{display:flex;gap:4px;overflow-x:auto;margin:16px 0 22px;padding-bottom:2px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{background:transparent;border:1px solid transparent;color:var(--mut);padding:8px 13px;border-radius:9px;cursor:pointer;white-space:nowrap;font-size:13.5px}
+nav button:hover{background:var(--bg2);color:var(--tx)}
+nav button[aria-selected="true"]{background:var(--acc);color:#04121f;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.card .k{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);font-weight:600}
+.card .v{font-size:25px;font-weight:650;margin-top:7px;font-variant-numeric:tabular-nums}
+.card .s{font-size:11.5px;color:var(--mut2);margin-top:3px}
+.v.ok{color:var(--ok)} .v.warn{color:var(--warn)} .v.err{color:var(--err)} .v.acc{color:var(--acc)}
+h2{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);margin:26px 0 10px;font-weight:600}
+h2:first-child{margin-top:0}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--mut);font-size:11px;letter-spacing:.07em;text-transform:uppercase;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 10px;border-bottom:1px solid var(--line2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sub{font-size:11.5px;color:var(--mut2);margin-top:2px}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.pill{display:inline-block;font-size:11px;padding:2.5px 9px;border-radius:999px;border:1px solid;font-weight:600}
+.p-ok{color:var(--ok);border-color:#166534;background:#052e16}
+.p-warn{color:var(--warn);border-color:#78350f;background:#2a1a04}
+.p-err{color:var(--err);border-color:#7f1d1d;background:#2a0a0a}
+.p-mut{color:var(--mut);border-color:#334155;background:#0f172a}
+.bar{height:6px;background:#1b2740;border-radius:999px;overflow:hidden;min-width:70px}
+.bar i{display:block;height:100%;background:var(--ok)}
+.bar i.w{background:var(--warn)}
+.bar i.e{background:var(--err)}
+.btn{background:var(--acc);color:#04121f;border:none;padding:9px 15px;border-radius:9px;font-weight:650;cursor:pointer;font-size:13.5px}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--tx);font-weight:500}
+.btn.ghost:hover{background:var(--bg2)}
+.btn.sm{padding:6px 11px;font-size:12.5px;border-radius:8px}
+.btn.danger{background:transparent;border:1px solid #7f1d1d;color:#fca5a5}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:14px 0}
+label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:5px;font-weight:600}
+input,select{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:9px 10px;font-size:13.5px}
+input:focus,select:focus{outline:2px solid rgba(56,189,248,.45);border-color:var(--acc)}
+.check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--tx);text-transform:none;letter-spacing:0}
+.check input{width:auto}
+.empty{color:var(--mut2);font-size:13px;padding:22px 4px;text-align:center}
+.sec{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:16px}
+.sec h3{margin:0 0 12px;font-size:14px;font-weight:650}
+.hint{font-size:12px;color:var(--mut2);line-height:1.55;margin-top:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.two{grid-template-columns:1fr}.wrap{padding:14px 12px 64px}.card .v{font-size:22px}}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(120%);background:#0f2740;border:1px solid var(--acc);color:var(--tx);padding:11px 18px;border-radius:11px;font-size:13.5px;transition:transform .25s;z-index:50;max-width:92vw}
+.toast.show{transform:translateX(-50%) translateY(0)}
+footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:var(--mut2);font-size:11.5px;line-height:1.6}
+code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radius:5px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><h1>E-COMMERCE AI <b>EMPIRE</b></h1><span class="tag">v1.0 · local</span></div>
+    <div class="meta">
+      <span><i class="dot"></i><span id="hStatus">pronto</span></span>
+      <span id="hUltima">sem execução</span>
+      <span id="hDados">0 produtos</span>
+    </div>
+  </header>
+
+  <nav id="nav" role="tablist"></nav>
+  <main id="view"></main>
+
+  <footer>
+    App web independente · dados salvos neste navegador (localStorage) · sem servidor e sem login.<br>
+    Motor determinístico: margem, preço para meta, estoque e checklist. Publicar, comprar e pagar exigem aprovação sua.
+  </footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var TAXAS = {
+    shopee:       { nome:"Shopee",       comissao:0.14, fixo:4.0 },
+    mercadolivre: { nome:"Mercado Livre", comissao:0.13, fixo:0.0 },
+    loja:         { nome:"Loja própria",  comissao:0.0,  fixo:0.0 }
+  };
+  var CHAVE = "empire.v1";
+  var PADRAO = {
+    config: { meta:30, estoqueMin:3, canal:"shopee", investimento:1000 },
+    produtos: [],
+    aprovacoes: [],
+    execucoes: [],
+    ultimaRodada: null
+  };
+  var estado = carregar();
+  var aba = "painel";
+
+  function carregar(){
+    try{
+      var bruto = localStorage.getItem(CHAVE);
+      if(!bruto) return JSON.parse(JSON.stringify(PADRAO));
+      var d = JSON.parse(bruto);
+      return Object.assign(JSON.parse(JSON.stringify(PADRAO)), d);
+    }catch(e){ return JSON.parse(JSON.stringify(PADRAO)); }
+  }
+  function salvar(){
+    try{ localStorage.setItem(CHAVE, JSON.stringify(estado)); }
+    catch(e){ aviso("Não foi possível salvar neste navegador."); }
+  }
+  function id(){ return Math.random().toString(36).slice(2,10); }
+  function num(v){ var n = Number(v); return isFinite(n) ? n : 0; }
+  function brl(v){ return "R$ " + num(v).toFixed(2).replace(".",","); }
+  function pct(v){ return num(v).toFixed(2).replace(".",",") + "%"; }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]; }); }
+  function agora(){ return new Date().toISOString(); }
+  function quando(iso){
+    if(!iso) return "—";
+    var d = new Date(iso);
+    if(isNaN(d.getTime())) return esc(iso);
+    return d.toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",year:"2-digit",hour:"2-digit",minute:"2-digit"});
+  }
+  function hoje(){
+    var d = new Date();
+    return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+  }
+  function aviso(txt){
+    var t = document.getElementById("toast");
+    t.textContent = txt; t.classList.add("show");
+    clearTimeout(aviso._t);
+    aviso._t = setTimeout(function(){ t.classList.remove("show"); }, 2600);
+  }
+
+  // ---------- motor determinístico ----------
+  function taxa(canal){ return TAXAS[canal] || TAXAS.shopee; }
+
+  function analisar(p, cfg){
+    var c = cfg || estado.config;
+    var t = taxa(p.canal);
+    var custo = num(p.custo), preco = num(p.preco), estoque = num(p.estoque);
+    var liquido = preco * (1 - t.comissao) - t.fixo - custo;
+    var margem = preco > 0 ? (liquido / preco) * 100 : 0;
+    var den = 1 - t.comissao - (num(c.meta)/100);
+    var alvo = den > 0 ? (custo + t.fixo) / den : null;
+    var bloq = [];
+    if(custo <= 0) bloq.push("custo não cadastrado");
+    if(preco <= 0) bloq.push("preço não cadastrado");
+    if(custo>0 && preco>0 && liquido <= 0) bloq.push("preço abaixo do custo");
+    if(custo>0 && preco>0 && liquido>0 && margem < num(c.meta)) bloq.push("margem "+pct(margem)+" abaixo da meta de "+num(c.meta)+"%");
+    if(!p.descricaoOk) bloq.push("descrição do anúncio incompleta");
+    if(estoque < num(c.estoqueMin)) bloq.push("estoque "+estoque+" un (mínimo "+num(c.estoqueMin)+")");
+    var veredito = bloq.length === 0 ? "pronto" : (bloq.some(function(b){ return b.indexOf("custo")>=0 || b.indexOf("preço")>=0; }) ? "bloqueado" : "ajustar");
+    return { produto:p, canal:t.nome, custo:custo, preco:preco, liquido:liquido, margem:margem, alvo:alvo, estoque:estoque, bloqueios:bloq, veredito:veredito };
+  }
+
+  function ativos(){ return estado.produtos.filter(function(p){ return p.status !== "pausado"; }); }
+
+  function registrar(rotina, resumo, detalhe, ok){
+    estado.execucoes.unshift({ id:id(), rotina:rotina, resumo:resumo, detalhe:detalhe, ok:!!ok, quando:agora() });
+    estado.execucoes = estado.execucoes.slice(0, 200);
+    estado.ultimaRodada = agora();
+    salvar();
+  }
+
+  function rodarPlano(){
+    var lista = ativos();
+    if(!lista.length){ registrar("plano_de_venda","Nenhum produto ativo","Cadastre um produto para o motor calcular margem.", false); return {ok:false}; }
+    var an = lista.map(function(p){ return analisar(p); });
+    var prontos = an.filter(function(a){ return a.veredito==="pronto"; });
+    var ajustar = an.filter(function(a){ return a.veredito==="ajustar"; });
+    var bloq = an.filter(function(a){ return a.veredito==="bloqueado"; });
+    var linhas = an.map(function(a){
+      return "• "+a.produto.nome+" ("+a.canal+"): "+brl(a.preco)+" · lucro "+brl(a.liquido)+" · margem "+pct(a.margem)+" · "+a.veredito
+        + (a.bloqueios.length ? " — "+a.bloqueios.join("; ") : "");
+    });
+    var abaixo = an.filter(function(a){ return a.alvo && a.margem < num(estado.config.meta); });
+    if(abaixo.length){
+      linhas.push(""); linhas.push("Preço para bater a meta:");
+      abaixo.forEach(function(a){ linhas.push("• "+a.produto.nome+": "+brl(a.alvo)); });
+    }
+    var resumo = an.length+" produto(s): "+prontos.length+" prontos, "+ajustar.length+" a ajustar, "+bloq.length+" bloqueados";
+    registrar("plano_de_venda", resumo, linhas.join("\n"), true);
+    var novas = 0;
+    prontos.forEach(function(a){
+      var ja = estado.aprovacoes.some(function(x){ return x.produtoId===a.produto.id && x.status==="pendente"; });
+      if(ja) return;
+      estado.aprovacoes.unshift({ id:id(), produtoId:a.produto.id, produto:a.produto.nome, acao:"publicar_anuncio",
+        detalhe:brl(a.preco)+" · lucro "+brl(a.liquido)+" · margem "+pct(a.margem), status:"pendente", quando:agora() });
+      novas++;
+    });
+    if(novas) salvar();
+    return { ok:true, resumo:resumo, novas:novas };
+  }
+
+  function rodarPendencias(){
+    var lista = ativos(), pend = [];
+    lista.forEach(function(p){
+      var e = num(p.estoque);
+      if(e < num(estado.config.estoqueMin)) pend.push(p.nome+": estoque "+e+" un (repor "+(num(estado.config.estoqueMin)-e)+")");
+      if(!p.descricaoOk) pend.push(p.nome+": descrição do anúncio incompleta");
+      if(!num(p.custo)) pend.push(p.nome+": custo não cadastrado");
+      if(!num(p.preco)) pend.push(p.nome+": preço não cadastrado");
+    });
+    var abertas = estado.aprovacoes.filter(function(a){ return a.status==="pendente"; }).length;
+    var detalhe = ["Produtos ativos: "+lista.length, "Aprovações aguardando decisão: "+abertas]
+      .concat(pend.length ? ["","Pendências:"].concat(pend.map(function(x){ return "• "+x; })) : []).join("\n");
+    registrar("pendencias", pend.length ? pend.length+" pendência(s) aberta(s)" : "nenhuma pendência aberta", detalhe, pend.length===0);
+    return { resumo: pend.length+" pendência(s)" };
+  }
+
+  function rodarTudo(silencioso){
+    var r = rodarPlano();
+    rodarPendencias();
+    render();
+    if(!silencioso) aviso(r.ok ? "Ciclo executado: "+r.resumo : "Sem produtos ativos.");
+  }
+
+  // ---------- auto-execução ao abrir ----------
+  function autoExecutar(){
+    if(!estado.produtos.length && !estado.execucoes.length){
+      var base = [
+        { nome:"Livro de Colorir Adulto - Animais", custo:18.5, preco:39.9, estoque:10, categoria:"livros", descricaoOk:true },
+        { nome:"Livro de Caligrafia - Iniciante", custo:16, preco:34.9, estoque:4, categoria:"livros", descricaoOk:true },
+        { nome:"Kit 3 Livros Mandala", custo:42, preco:79.9, estoque:6, categoria:"livros", descricaoOk:false }
+      ];
+      base.forEach(function(b){
+        estado.produtos.push(Object.assign({ id:id(), canal:"shopee", status:"ativo", origem:"exemplo", criado:agora() }, b));
+      });
+      salvar();
+    }
+    var ultima = estado.ultimaRodada ? new Date(estado.ultimaRodada) : null;
+    var passouDoDia = !ultima || ultima.toDateString() !== new Date().toDateString();
+    if(ativos().length && passouDoDia){
+      rodarTudo(true);
+      aviso("Rotina do dia executada automaticamente.");
+    }
+  }
+
+  // ---------- componentes ----------
+  function kpi(k, v, extra, cls){
+    return '<div class="card"><div class="k">'+esc(k)+'</div><div class="v '+(cls||"")+'">'+v+'</div>'
+      + (extra ? '<div class="s">'+esc(extra)+'</div>' : '') + '</div>';
+  }
+
+  function barra(margem, meta){
+    var largura = Math.max(2, Math.min(100, margem));
+    var cls = margem >= meta ? "" : (margem > meta*0.6 ? "w" : "e");
+    return '<div class="bar"><i class="'+cls+'" style="width:'+largura.toFixed(0)+'%"></i></div>';
+  }
+
+  function pill(veredito){
+    var map = { pronto:["p-ok","pronto"], ajustar:["p-warn","ajustar"], bloqueado:["p-err","bloqueado"] };
+    var m = map[veredito] || ["p-mut",veredito];
+    return '<span class="pill '+m[0]+'">'+m[1]+'</span>';
+  }
+
+  // ---------- telas ----------
+  function telaPainel(){
+    var lista = ativos();
+    var an = lista.map(function(p){ return analisar(p); });
+    var prontos = an.filter(function(a){ return a.veredito==="pronto"; }).length;
+    var pendentes = estado.aprovacoes.filter(function(a){ return a.status==="pendente"; }).length;
+    var ultima = estado.execucoes[0];
+    var margemMedia = an.length ? an.reduce(function(s,a){ return s + a.margem; },0)/an.length : 0;
+    var lucroTotal = an.reduce(function(s,a){ return s + Math.max(0,a.liquido) * Math.max(0,a.estoque); },0);
+
+    var html = '<div class="grid">'
+      + kpi("Produtos ativos", lista.length, (estado.produtos.length-lista.length)+" pausado(s)")
+      + kpi("Prontos para vender", prontos, "margem ≥ "+num(estado.config.meta)+"%", prontos ? "ok":"warn")
+      + kpi("Margem média", pct(margemMedia), "meta "+num(estado.config.meta)+"%", margemMedia>=num(estado.config.meta)?"ok":"warn")
+      + kpi("Lucro potencial", brl(lucroTotal), "estoque × lucro unitário")
+      + kpi("Aprovações", pendentes, pendentes ? "aguardando você" : "nada pendente", pendentes?"warn":"ok")
+      + '</div>';
+
+    html += '<div class="two"><div class="sec"><h3>Produtos e margem real</h3><div class="scroll">';
+    if(!an.length){
+      html += '<div class="empty">Nenhum produto ainda. Vá em <b>Produtos</b> e cadastre um, ou use o botão de exemplos.</div>';
+    } else {
+      html += '<table><thead><tr><th>Produto</th><th class="n">Preço</th><th class="n">Lucro</th><th class="n">Margem</th><th>Meta</th><th class="n">Preço p/ meta</th><th class="n">Estoque</th><th>Veredito</th></tr></thead><tbody>';
+      an.forEach(function(a){
+        html += '<tr><td><b>'+esc(a.produto.nome)+'</b><div class="sub">'+esc(a.canal)+' · '+(a.produto.origem==="real"?"dado real":"exemplo")+'</div></td>'
+          + '<td class="n">'+brl(a.preco)+'</td>'
+          + '<td class="n">'+brl(a.liquido)+'</td>'
+          + '<td class="n '+(a.margem>=num(estado.config.meta)?"":"")+'" style="color:'+(a.margem>=num(estado.config.meta)?"var(--ok)":"var(--warn)")+'">'+pct(a.margem)+'</td>'
+          + '<td style="min-width:80px">'+barra(a.margem, num(estado.config.meta))+'</td>'
+          + '<td class="n">'+(a.alvo?brl(a.alvo):"—")+'</td>'
+          + '<td class="n">'+a.estoque+'</td>'
+          + '<td>'+pill(a.veredito)+'</td></tr>';
+      });
+      html += '</tbody></table>';
+    }
+    html += '</div><div class="hint">Margem já desconta a comissão do canal ('+(taxa("shopee").comissao*100)+'% na Shopee) e a tarifa fixa de '+brl(taxa("shopee").fixo)+'.</div></div>';
+
+    html += '<div class="sec"><h3>Última execução automática</h3>';
+    if(!ultima){ html += '<div class="empty">Nenhuma execução registrada.</div>'; }
+    else {
+      html += '<div class="row" style="justify-content:space-between;align-items:flex-start">'
+        + '<div><b>'+esc(ultima.rotina)+'</b> · '+esc(ultima.resumo)+'<div class="sub">'+quando(ultima.quando)+'</div></div>'
+        + '<span class="pill '+(ultima.ok?"p-ok":"p-warn")+'">'+(ultima.ok?"ok":"atenção")+'</span></div>'
+        + '<pre style="white-space:pre-wrap;font:12.5px/1.6 ui-monospace,SFMono-Regular,monospace;color:var(--mut);margin:12px 0 0">'+esc(ultima.detalhe)+'</pre>';
+    }
+    html += '<div class="row" style="margin-top:14px"><button class="btn" onclick="EMPIRE.rodar()">Executar ciclo agora</button>'
+      + '<button class="btn ghost" onclick="EMPIRE.ir(\'rotinas\')">Ver rotinas</button></div></div></div>';
+    return html;
+  }
+
+  function telaProdutos(){
+    var html = '<div class="sec"><h3>Novo produto</h3><div class="form">'
+      + campo("f-nome","Nome do produto","text","")
+      + campo("f-custo","Custo unitário (R$)","number","")
+      + campo("f-preco","Preço de venda (R$)","number","")
+      + campo("f-estoque","Estoque atual","number","0")
+      + '<div><label>Canal</label><select id="f-canal">'
+      + Object.keys(TAXAS).map(function(k){ return '<option value="'+k+'"'+(k==="shopee"?" selected":"")+'>'+TAXAS[k].nome+'</option>'; }).join("")
+      + '</select></div>'
+      + campo("f-cat","Categoria","text","")
+      + '<div><label>&nbsp;</label><label class="check"><input type="checkbox" id="f-desc" checked> Descrição pronta</label></div>'
+      + '</div><div class="row"><button class="btn" onclick="EMPIRE.addProduto()">Adicionar produto</button>'
+      + '<button class="btn ghost" onclick="EMPIRE.exemplos()">Carregar 3 exemplos</button></div>'
+      + '<div class="hint">Deixe custo e preço reais para a margem ficar correta. Tarifas por canal já são aplicadas automaticamente.</div></div>';
+
+    html += '<div class="sec"><h3>Catálogo ('+estado.produtos.length+')</h3><div class="scroll">';
+    if(!estado.produtos.length){ html += '<div class="empty">Nenhum produto cadastrado.</div>'; }
+    else {
+      var an = estado.produtos.map(function(p){ return analisar(p); });
+      html += '<table><thead><tr><th>Produto</th><th>Canal</th><th class="n">Custo</th><th class="n">Preço</th><th class="n">Margem</th><th class="n">Estoque</th><th>Status</th><th></th></tr></thead><tbody>';
+      an.forEach(function(a){
+        var p = a.produto;
+        html += '<tr><td><b>'+esc(p.nome)+'</b><div class="sub">'+esc(p.categoria||"—")+' · '+(p.origem==="real"?"real":"exemplo")+'</div></td>'
+          + '<td>'+esc(a.canal)+'</td><td class="n">'+brl(p.custo)+'</td><td class="n">'+brl(p.preco)+'</td>'
+          + '<td class="n" style="color:'+(a.margem>=num(estado.config.meta)?"var(--ok)":"var(--warn)")+'">'+pct(a.margem)+'</td>'
+          + '<td class="n">'+a.estoque+'</td>'
+          + '<td><span class="pill '+(p.status==="pausado"?"p-mut":"p-ok")+'">'+(p.status==="pausado"?"pausado":"ativo")+'</span></td>'
+          + '<td class="n"><button class="btn ghost sm" onclick="EMPIRE.editar(\''+p.id+'\')">Editar</button> '
+          + '<button class="btn danger sm" onclick="EMPIRE.remover(\''+p.id+'\')">Excluir</button></td></tr>';
+      });
+      html += '</tbody></table>';
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  function campo(idEx, rotulo, tipo, valor){
+    return '<div><label for="'+idEx+'">'+rotulo+'</label><input id="'+idEx+'" type="'+tipo+'" value="'+esc(valor)+'"></div>';
+  }
+
+  function telaAprovacoes(){
+    var pend = estado.aprovacoes.filter(function(a){ return a.status==="pendente"; });
+    var hist = estado.aprovacoes.filter(function(a){ return a.status!=="pendente"; }).slice(0,20);
+    var html = '<div class="sec"><h3>Aguardando sua decisão ('+pend.length+')</h3>';
+    if(!pend.length){ html += '<div class="empty">Nada pendente. Rode o ciclo na aba Painel para gerar pedidos.</div>'; }
+    else {
+      html += '<div class="scroll"><table><thead><tr><th>Produto</th><th>Ação pedida</th><th>Números</th><th class="n">Quando</th><th></th></tr></thead><tbody>';
+      pend.forEach(function(a){
+        html += '<tr><td><b>'+esc(a.produto)+'</b></td><td>'+esc(a.acao)+'</td><td>'+esc(a.detalhe)+'</td>'
+          + '<td class="n">'+quando(a.quando)+'</td>'
+          + '<td class="n"><button class="btn sm" onclick="EMPIRE.decidir(\''+a.id+'\',\'aprovado\')">Aprovar</button> '
+          + '<button class="btn danger sm" onclick="EMPIRE.decidir(\''+a.id+'\',\'rejeitado\')">Rejeitar</button></td></tr>';
+      });
+      html += '</tbody></table></div>';
+      html += '<div class="hint">Aprovar aqui registra sua decisão. O app não publica sozinho em marketplace nenhum: sem as credenciais da Shopee, a publicação continua manual.</div>';
+    }
+    html += '</div>';
+    html += '<div class="sec"><h3>Histórico de decisões</h3>';
+    if(!hist.length){ html += '<div class="empty">Nenhuma decisão tomada ainda.</div>'; }
+    else {
+      html += '<div class="scroll"><table><thead><tr><th>Produto</th><th>Ação</th><th class="n">Quando</th><th>Status</th></tr></thead><tbody>';
+      hist.forEach(function(a){
+        html += '<tr><td>'+esc(a.produto)+'</td><td>'+esc(a.acao)+'</td><td class="n">'+quando(a.quando)+'</td>'
+          + '<td><span class="pill '+(a.status==="aprovado"?"p-ok":"p-err")+'">'+esc(a.status)+'</span></td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function telaRotinas(){
+    var horarios = [
+      ["plano_de_venda","Plano de venda","Todo dia às 07:30","margem, preço para meta, estoque e checklist"],
+      ["pendencias","Pendências","Todo dia às 12:00 e 18:00","o que trava a venda agora"],
+      ["ciclo","Ciclo contínuo","a cada 30 min, 07h às 22h","roda plano + pendências juntos"]
+    ];
+    var html = '<div class="sec"><h3>Agenda</h3><div class="scroll"><table><thead><tr><th>Rotina</th><th>Quando</th><th>O que faz</th></tr></thead><tbody>';
+    horarios.forEach(function(h){
+      html += '<tr><td><b>'+h[1]+'</b><div class="sub">'+h[0]+'</div></td><td>'+h[2]+'</td><td>'+h[3]+'</td></tr>';
+    });
+    html += '</tbody></table></div>'
+      + '<div class="row" style="margin-top:14px"><button class="btn" onclick="EMPIRE.rodar()">Executar as três agora</button>'
+      + '<button class="btn ghost" onclick="EMPIRE.rodarPendencias()">Só pendências</button></div>'
+      + '<div class="hint">Ao abrir o app depois do horário, a rotina do dia roda sozinha e fica registrada. Como é um app sem servidor, ele executa quando você abre, não em segundo plano com o navegador fechado.</div></div>';
+
+    html += '<div class="sec"><h3>Histórico ('+estado.execucoes.length+')</h3>';
+    if(!estado.execucoes.length){ html += '<div class="empty">Nenhuma execução ainda.</div>'; }
+    else {
+      html += '<div class="scroll"><table><thead><tr><th>Rotina</th><th>Resultado</th><th class="n">Quando</th><th>Estado</th></tr></thead><tbody>';
+      estado.execucoes.slice(0,40).forEach(function(e){
+        html += '<tr><td><b>'+esc(e.rotina)+'</b></td><td>'+esc(e.resumo)+'</td><td class="n">'+quando(e.quando)+'</td>'
+          + '<td><span class="pill '+(e.ok?"p-ok":"p-warn")+'">'+(e.ok?"ok":"atenção")+'</span></td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function telaRelatorios(){
+    var an = ativos().map(function(p){ return analisar(p); });
+    var receita = an.reduce(function(s,a){ return s + a.preco * Math.max(0,a.estoque); }, 0);
+    var lucro = an.reduce(function(s,a){ return s + Math.max(0,a.liquido) * Math.max(0,a.estoque); }, 0);
+    var html = '<div class="grid">'
+      + kpi("Receita potencial", brl(receita), "preço × estoque disponível")
+      + kpi("Lucro potencial", brl(lucro), "líquido × estoque")
+      + kpi("Investimento previsto", brl(estado.config.investimento), "configurável abaixo")
+      + kpi("Retorno sobre investimento", estado.config.investimento>0 ? pct(lucro/estado.config.investimento*100) : "—", "lucro potencial / investimento")
+      + '</div>';
+    html += '<div class="sec"><h3>Configuração</h3><div class="form">'
+      + campo("c-meta","Margem alvo (%)","number",estado.config.meta)
+      + campo("c-min","Estoque mínimo (un)","number",estado.config.estoqueMin)
+      + campo("c-inv","Investimento (R$)","number",estado.config.investimento)
+      + '</div><div class="row"><button class="btn" onclick="EMPIRE.salvarConfig()">Salvar configuração</button></div>'
+      + '<div class="hint">A meta de margem alimenta o preço sugerido de cada produto e o veredito pronto/ajustar.</div></div>';
+    html += '<div class="sec"><h3>Exportar e backup</h3><div class="row">'
+      + '<button class="btn ghost" onclick="EMPIRE.exportarJSON()">Baixar backup (JSON)</button>'
+      + '<button class="btn ghost" onclick="EMPIRE.exportarCSV()">Baixar produtos (CSV)</button>'
+      + '<button class="btn ghost" onclick="document.getElementById(\'imp\').click()">Importar backup</button>'
+      + '<input id="imp" type="file" accept=".json" style="display:none" onchange="EMPIRE.importar(this)">'
+      + '<button class="btn danger" onclick="EMPIRE.limpar()">Apagar tudo</button>'
+      + '</div><div class="hint">O backup é um arquivo JSON com produtos, aprovações e histórico. Guarde no seu computador: os dados vivem neste navegador.</div></div>';
+    return html;
+  }
+
+  // ---------- render ----------
+  var ABAS = [["painel","Painel"],["produtos","Produtos"],["aprovacoes","Aprovações"],["rotinas","Rotinas"],["relatorios","Relatórios"]];
+
+  function render(){
+    document.getElementById("nav").innerHTML = ABAS.map(function(a){
+      return '<button role="tab" aria-selected="'+(aba===a[0])+'" onclick="EMPIRE.ir(\''+a[0]+'\')">'+a[1]+'</button>';
+    }).join("");
+    var v = document.getElementById("view");
+    v.innerHTML = aba==="painel" ? telaPainel()
+      : aba==="produtos" ? telaProdutos()
+      : aba==="aprovacoes" ? telaAprovacoes()
+      : aba==="rotinas" ? telaRotinas()
+      : telaRelatorios();
+
+    document.getElementById("hDados").textContent = estado.produtos.length + " produto(s)";
+    document.getElementById("hUltima").textContent = estado.ultimaRodada ? "última: "+quando(estado.ultimaRodada) : "sem execução";
+    var pend = estado.aprovacoes.filter(function(a){ return a.status==="pendente"; }).length;
+    document.getElementById("hStatus").textContent = pend ? pend+" aprovação(ões) pendente(s)" : "pronto";
+  }
+
+  // ---------- ações ----------
+  window.EMPIRE = {
+    ir: function(a){ aba = a; render(); window.scrollTo({top:0,behavior:"smooth"}); },
+    rodar: function(){ rodarTudo(false); },
+    rodarPendencias: function(){ rodarPendencias(); render(); aviso("Pendências atualizadas."); },
+    addProduto: function(){
+      var nome = document.getElementById("f-nome").value.trim();
+      var custo = num(document.getElementById("f-custo").value);
+      var preco = num(document.getElementById("f-preco").value);
+      if(!nome){ aviso("Dê um nome ao produto."); return; }
+      if(custo<=0 || preco<=0){ aviso("Custo e preço precisam ser maiores que zero."); return; }
+      estado.produtos.unshift({ id:id(), nome:nome, custo:custo, preco:preco,
+        estoque:num(document.getElementById("f-estoque").value),
+        canal:document.getElementById("f-canal").value,
+        categoria:document.getElementById("f-cat").value.trim(),
+        descricaoOk:document.getElementById("f-desc").checked,
+        status:"ativo", origem:"real", criado:agora() });
+      salvar(); render(); aviso("Produto cadastrado.");
+    },
+    exemplos: function(){
+      var base = [
+        { nome:"Livro de Colorir Adulto - Animais", custo:18.5, preco:39.9, estoque:10, categoria:"livros", descricaoOk:true },
+        { nome:"Livro de Caligrafia - Iniciante", custo:16, preco:34.9, estoque:4, categoria:"livros", descricaoOk:true },
+        { nome:"Kit 3 Livros Mandala", custo:42, preco:79.9, estoque:6, categoria:"livros", descricaoOk:false }
+      ];
+      base.forEach(function(b){
+        if(estado.produtos.some(function(p){ return p.nome===b.nome; })) return;
+        estado.produtos.push(Object.assign({ id:id(), canal:"shopee", status:"ativo", origem:"exemplo", criado:agora() }, b));
+      });
+      salvar(); render(); aviso("Exemplos carregados. Edite com seus custos reais.");
+    },
+    editar: function(pid){
+      var p = estado.produtos.filter(function(x){ return x.id===pid; })[0];
+      if(!p) return;
+      var nome = prompt("Nome do produto:", p.nome); if(nome===null) return;
+      var custo = prompt("Custo unitário (R$):", p.custo); if(custo===null) return;
+      var preco = prompt("Preço de venda (R$):", p.preco); if(preco===null) return;
+      var estoque = prompt("Estoque atual:", p.estoque); if(estoque===null) return;
+      var desc = confirm("A descrição do anúncio está pronta?");
+      p.nome = nome.trim() || p.nome;
+      p.custo = num(custo); p.preco = num(preco); p.estoque = num(estoque);
+      p.descricaoOk = desc; p.origem = "real";
+      salvar(); render(); aviso("Produto atualizado.");
+    },
+    remover: function(pid){
+      var p = estado.produtos.filter(function(x){ return x.id===pid; })[0];
+      if(!p || !confirm("Excluir \""+p.nome+"\"?")) return;
+      estado.produtos = estado.produtos.filter(function(x){ return x.id!==pid; });
+      salvar(); render(); aviso("Produto excluído.");
+    },
+    decidir: function(aid, status){
+      var a = estado.aprovacoes.filter(function(x){ return x.id===aid; })[0];
+      if(!a) return;
+      a.status = status; a.decidido = agora();
+      salvar(); render();
+      aviso(status==="aprovado" ? "Aprovado: publique manualmente quando quiser." : "Pedido rejeitado.");
+    },
+    salvarConfig: function(){
+      estado.config.meta = num(document.getElementById("c-meta").value) || 30;
+      estado.config.estoqueMin = num(document.getElementById("c-min").value) || 3;
+      estado.config.investimento = num(document.getElementById("c-inv").value) || 0;
+      salvar(); render(); aviso("Configuração salva.");
+    },
+    exportarJSON: function(){
+      baixar("empire-backup.json", JSON.stringify(estado, null, 2), "application/json");
+    },
+    exportarCSV: function(){
+      var linhas = [["produto","canal","custo","preco","margem_pct","preco_meta","estoque","veredito","status"]];
+      estado.produtos.map(function(p){ return analisar(p); }).forEach(function(a){
+        linhas.push([a.produto.nome, a.canal, a.custo.toFixed(2), a.preco.toFixed(2), a.margem.toFixed(2), a.alvo?a.alvo.toFixed(2):"", a.estoque, a.veredito, a.produto.status]);
+      });
+      var csv = linhas.map(function(l){ return l.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(";"); }).join("\n");
+      baixar("empire-produtos.csv", "\ufeff"+csv, "text/csv");
+    },
+    importar: function(input){
+      var f = input.files && input.files[0]; if(!f) return;
+      var leitor = new FileReader();
+      leitor.onload = function(){
+        try{
+          var d = JSON.parse(leitor.result);
+          if(!d || !Array.isArray(d.produtos)) throw new Error("formato");
+          estado = Object.assign(JSON.parse(JSON.stringify(PADRAO)), d);
+          salvar(); render(); aviso("Backup importado.");
+        }catch(e){ aviso("Arquivo inválido."); }
+      };
+      leitor.readAsText(f);
+    },
+    limpar: function(){
+      if(!confirm("Apagar todos os dados deste navegador? Baixe o backup antes.")) return;
+      estado = JSON.parse(JSON.stringify(PADRAO));
+      salvar(); render(); aviso("Dados apagados.");
+    }
+  };
+
+  function baixar(nome, conteudo, tipo){
+    var blob = new Blob([conteudo], { type: tipo });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = nome;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 600);
+  }
+
+  render();
+  autoExecutar();
+})();
+</script>
+</body>
+</html>

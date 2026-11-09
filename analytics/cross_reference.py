@@ -138,6 +138,10 @@ def aderencia(titulo_marketplace: str, titulo_fornecedor: str) -> float:
     return len(alvo & tokens(titulo_fornecedor)) / len(alvo)
 
 
+def _comuns(titulo_marketplace: str, titulo_fornecedor: str) -> set[str]:
+    return tokens(titulo_marketplace) & tokens(titulo_fornecedor)
+
+
 def cruzar(
     anuncios: Iterable[AnuncioMarketplace],
     acervo: list[ItemFornecedor],
@@ -152,11 +156,18 @@ def cruzar(
             key=lambda par: par[1],
             reverse=True,
         )
-        boas = [(item, nota) for item, nota in notas[: alternativas + 1] if nota >= minimo]
+        # exigir dois termos distintivos em comum evita casar "maleta de brinquedo"
+        # com "maleta de ferramentas" só porque compartilham a palavra maleta
+        boas = [
+            (item, nota)
+            for item, nota in notas[: alternativas + 1]
+            if nota >= minimo and len(_comuns(anuncio.titulo, item.nome)) >= 2
+        ]
         if boas:
             melhor, nota = boas[0]
             motivo = (
                 f"{nota:.0%} das palavras do anúncio aparecem no produto do fornecedor"
+                f" ({len(_comuns(anuncio.titulo, melhor.nome))} termos em comum)"
             )
             resultado.append(
                 Cruzamento(

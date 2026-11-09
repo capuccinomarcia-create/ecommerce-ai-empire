@@ -1025,15 +1025,20 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
   function carregarConcorrencia(){
     fetch("concorrencia.json").then(function(r){ return r.json(); }).then(function(d){
       if(!d || !d.anuncios) return;
-      CONC.capturados = d.anuncios.map(function(a){
-        return { id: id(), canal: a.canal, produto: a.produto, preco: num(a.preco),
-                 unidades: num(a.unidades) || 1, vendidos: (a.vendidos == null ? null : num(a.vendidos)),
+      var novos = d.anuncios.map(function(a){
+        return { nome: a.produto, canal: a.canal, preco: num(a.preco),
+                 unidades: num(a.unidades) || 1,
+                 vendidos: (a.vendidos == null ? null : num(a.vendidos)),
                  url: a.url || "", frete: false, quando: d.capturado_em || "" };
       });
-      CONC.resultado = estrategiaConcorrencia(CONC.capturados);
+      var jaTem = {};
+      CONC.lista = CONC.lista.concat([]);
+      CONC.lista.forEach(function(c){ jaTem[(c.canal + "|" + c.nome)] = 1; });
+      novos.forEach(function(n){ if(!jaTem[(n.canal + "|" + n.nome)]) CONC.lista.push(n); });
       CONC.fonte = d.fonte || "";
+      CONC.capturadoEm = d.capturado_em || "";
       render();
-    }).catch(function(){});
+    }).catch(function(e){ CONC.erro = "concorrencia.json não carregou"; render(); });
   }
 
   function carregarCatalogo(){

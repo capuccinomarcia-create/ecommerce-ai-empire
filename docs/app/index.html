@@ -288,7 +288,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
     var lucroTotal = an.reduce(function(s,a){ return s + Math.max(0,a.liquido) * Math.max(0,a.estoque); },0);
 
     var html = '<div class="grid">'
-      + kpi("Produtos ativos", lista.length, (estado.produtos.length-lista.length)+" pausado(s)")
+      + kpi("Fornecedor", (CAT.meta ? Number(CAT.meta.total).toLocaleString("pt-BR") : "…"), "produtos lidos do site") + kpi("Produtos ativos", lista.length, (estado.produtos.length-lista.length)+" pausado(s)")
       + kpi("Prontos para vender", prontos, "margem ≥ "+num(estado.config.meta)+"%", prontos ? "ok":"warn")
       + kpi("Margem média", pct(margemMedia), "meta "+num(estado.config.meta)+"%", margemMedia>=num(estado.config.meta)?"ok":"warn")
       + kpi("Lucro potencial", brl(lucroTotal), "estoque × lucro unitário")
@@ -454,15 +454,19 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
   }
 
   // ---------- render ----------
-  var ABAS = [["painel","Painel"],["escanear","Escanear"],["produtos","Produtos"],["aprovacoes","Aprovações"],["rotinas","Rotinas"],["relatorios","Relatórios"]];
+  var ABAS = [["painel","Painel"],["escanear","Escanear"],["fornecedor","Fornecedor"],["produtos","Produtos"],["aprovacoes","Aprovações"],["rotinas","Rotinas"],["relatorios","Relatórios"]];
 
   function render(){
+    try {
+      if(("" + location.hash).replace("#","") !== aba) history.replaceState(null, "", "#" + aba);
+    } catch(e){}
     document.getElementById("nav").innerHTML = ABAS.map(function(a){
       return '<button role="tab" aria-selected="'+(aba===a[0])+'" onclick="EMPIRE.ir(\''+a[0]+'\')">'+a[1]+'</button>';
     }).join("");
     var v = document.getElementById("view");
     v.innerHTML = aba==="painel" ? telaPainel()
       : aba==="escanear" ? telaEscanear()
+      : aba==="fornecedor" ? telaFornecedor()
       : aba==="produtos" ? telaProdutos()
       : aba==="aprovacoes" ? telaAprovacoes()
       : aba==="rotinas" ? telaRotinas()
@@ -1012,6 +1016,182 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
   carregarScan();
 
 
+  // ---------- catálogo completo do fornecedor (sitemap) ----------
+  var CAT = { lista: [], meta: null, filtro: "", cat: "Todos", pagina: 0, porPagina: 24,
+              carregando: true, erro: "", analise: null, analisando: false, idAnalise: -1 };
+
+  function carregarCatalogo(){
+    CAT.carregando = true;
+    fetch("catalogo.json")
+      .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function(d){
+        CAT.lista = d.produtos || [];
+        CAT.meta = { total: d.total, atualizado: d.atualizado, fonte: d.fonte };
+        CAT.carregando = false;
+        try { localStorage.setItem("empire_catalogo", JSON.stringify(CAT.meta)); } catch(e){}
+      })
+      .catch(function(e){
+        CAT.carregando = false;
+        CAT.erro = "Não consegui carregar o catálogo do fornecedor (" + e.message + ").";
+      })
+      .then(function(){ render(); });
+  }
+
+  function catFiltrada(){
+    var f = CAT.filtro.trim().toLowerCase();
+    return CAT.lista.filter(function(p){
+      if(CAT.cat !== "Todos" && p.c !== CAT.cat) return false;
+      if(!f) return true;
+      return (p.n || "").toLowerCase().indexOf(f) >= 0 || (p.u || "").toLowerCase().indexOf(f) >= 0;
+    });
+  }
+
+  function cfgScan(){
+    return {
+      meta: num((document.getElementById("s-meta") || {}).value) || 30,
+      orcamento: num((document.getElementById("s-orcamento") || {}).value) || 1000,
+      qtd: num((document.getElementById("s-qtd") || {}).value) || 1,
+      markup: num((document.getElementById("s-markup") || {}).value) || 3,
+    };
+  }
+
+  function aplicarProdutoAoMeuCatalogo(a){
+    estado.produtos.unshift({
+      id: id(), nome: limparNome(a.item.nome), custo: a.custo,
+      preco: a.canais[a.melhor].precoMeta || a.venda, estoque: 0,
+      canal: a.melhor === "TikTok Shop" ? "tiktok" : (a.melhor === "Shopee" ? "shopee" : "mercadolivre"),
+      categoria: categoriaDe(a.item.nome), descricaoOk: true, status: "ativo",
+      origem: "feiradamadrugadasp", criado: agora(),
+    });
+    salvar(); aviso("Produto adicionado ao catálogo.");
+  }
+
+  function telaFornecedor(){
+    if(CAT.carregando){
+      return '<div class="panel"><p class="muted">Carregando o catálogo do fornecedor…</p></div>';
+    }
+    var categorias = ["Todos"];
+    CAT.lista.forEach(function(p){ if(p.c && categorias.indexOf(p.c) < 0) categorias.push(p.c); });
+    categorias.sort(function(a,b){ return a === "Todos" ? -1 : a.localeCompare(b); });
+
+    var lista = catFiltrada();
+    var totalPag = Math.max(1, Math.ceil(lista.length / CAT.porPagina));
+    if(CAT.pagina > totalPag - 1) CAT.pagina = 0;
+    var inicio = CAT.pagina * CAT.porPagina;
+    var pagina = lista.slice(inicio, inicio + CAT.porPagina);
+
+    var html = '<div class="panel">' +
+      '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">' +
+      '<h3 style="margin:0">Catálogo do fornecedor</h3>' +
+      '<span class="pill">' + (CAT.meta ? Number(CAT.meta.total).toLocaleString("pt-BR") + " produtos" : "") +
+      (CAT.meta ? " · atualizado " + CAT.meta.atualizado : "") + '</span></div>' +
+      '<p class="muted" style="margin:8px 0 0">Lido do sitemap de ' + esc(CAT.meta ? CAT.meta.fonte : "feiradamadrugadasp.com.br") +
+      '. Use a busca e o botão Analisar para puxar preço, margem nos três canais e anúncio pronto.</p>' +
+      (CAT.erro ? '<p style="color:#b91c1c;margin:8px 0 0">' + esc(CAT.erro) + '</p>' : '') +
+      '<div class="row" style="margin-top:12px"><div>' +
+      '<label for="cat-busca">Buscar produto</label>' +
+      '<input id="cat-busca" placeholder="ex: canetinha, mochila, squishy" value="' + esc(CAT.filtro) + '"' +
+      ' oninput="EMF.fornecedorBuscar(this.value)"></div></div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">' +
+      categorias.map(function(c){
+        return '<button class="tab' + (CAT.cat === c ? " on" : "") + '" style="padding:6px 10px;font-size:12px"' +
+          ' onclick="EMF.fornecedorCat(\'' + esc(c) + '\')">' + esc(c) + '</button>';
+      }).join("") +
+      '</div></div>';
+
+    if(CAT.analise){
+      var a = CAT.analise;
+      html += '<div class="panel" style="border-left:3px solid var(--accent,#0f766e)">' +
+        '<div class="winner">' + (a.item.img ? '<img src="' + esc(a.item.img) + '" alt="" onerror="this.style.display=\'none\'">' : '') +
+        '<div style="flex:1"><h3 style="margin:0 0 4px">' + esc(a.item.nome) + '</h3>' +
+        '<p class="muted" style="margin:0 0 8px">vendedor: ' + (a.item.vendidos || "—") + ' vendidos · nota ' + (a.item.nota || "—") +
+        ' · ref ' + esc(a.item.ref || "—") + '</p>' +
+        '<div class="kpis" style="margin:0">' + kpi("Custo (1 a 3 un)", brl(a.custo), a.custo10 ? "10+ un: " + brl(a.custo10) : "") +
+        kpi("Venda sugerida", brl(a.venda), cfgScan().markup + "x o custo") +
+        kpi("Melhor canal", a.melhor, brl(a.canais[a.melhor].lucro) + " por peça") +
+        kpi("Margem", pct(a.canais[a.melhor].margem) + "%", "meta " + cfgScan().meta + "%") + '</div>' +
+        '<div class="row" style="margin-top:10px">' +
+        '<a class="btn ghost" href="' + esc(a.item.url) + '" target="_blank" rel="noopener">Abrir no fornecedor</a>' +
+        '<button class="btn" onclick="EMF.aplicarAoCatalogo(' + CAT.idAnalise + ')">Usar no meu catálogo</button>' +
+        '<button class="btn ghost" onclick="EMF.copiarAnuncio(' + CAT.idAnalise + ',\'' + a.melhor + '\')">Copiar anúncio ' + a.melhor + '</button>' +
+        '</div></div></div>' +
+        '<div class="grid" style="margin-top:12px">' + Object.keys(a.canais).map(function(c){
+          var v = a.canais[c];
+          return '<div class="card"><strong>' + esc(c) + '</strong>' +
+            '<p class="muted" style="margin:4px 0">lucro ' + brl(v.lucro) + ' · margem ' + fmt(v.margem) + '%</p>' +
+            '<p style="margin:0">preço p/ ' + cfgScan().meta + '%: <strong>' + brl(v.precoMeta) + '</strong></p>' +
+            '<p class="muted" style="margin:4px 0 0">' + (v.viavel ? "viável no preço de venda" : "precisa subir o preço") + '</p></div>';
+        }).join("") + '</div></div>';
+    }
+
+    html += '<div class="panel"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap">' +
+      '<strong>' + lista.length + ' produto(s)</strong>' +
+      '<span class="muted">página ' + (CAT.pagina + 1) + ' de ' + totalPag + '</span></div>' +
+      '<div class="grid" style="margin-top:10px">' +
+      pagina.map(function(p){
+        var idx = CAT.lista.indexOf(p);
+        return '<div class="card">' +
+          (p.i ? '<img src="' + esc(p.i) + '" alt="" loading="lazy" style="width:100%;height:150px;object-fit:contain;background:#fff;border-radius:8px" onerror="this.style.display=\'none\'">' : '') +
+          '<p style="margin:8px 0 2px;font-weight:600;font-size:13px">' + esc(p.n) + '</p>' +
+          '<p class="muted" style="margin:0 0 8px;font-size:12px">' + esc(p.c || "—") + '</p>' +
+          '<button class="btn ghost" style="width:100%;padding:6px" onclick="EMF.analisarProduto(' + idx + ')">Analisar</button></div>';
+      }).join("") + '</div>' +
+      (totalPag > 1 ? '<div class="row" style="margin-top:12px">' +
+        (CAT.pagina > 0 ? '<button class="btn ghost" onclick="EMF.fornecedorPagina(' + (CAT.pagina - 1) + ')">Anterior</button>' : '') +
+        (CAT.pagina < totalPag - 1 ? '<button class="btn ghost" onclick="EMF.fornecedorPagina(' + (CAT.pagina + 1) + ')">Próxima</button>' : '') +
+        '</div>' : '') +
+      '</div>';
+    return html;
+  }
+
+  window.EMF = {
+    fornecedorBuscar: function(v){
+      clearTimeout(window.__catTimer);
+      window.__catTimer = setTimeout(function(){ CAT.filtro = v; CAT.pagina = 0; render(); }, 220);
+    },
+    fornecedorCat: function(c){ CAT.cat = c; CAT.pagina = 0; render(); },
+    fornecedorPagina: function(n){ CAT.pagina = Math.max(0, n); render(); },
+    analisarProduto: function(idx){
+      var p = CAT.lista[idx];
+      if(!p) return;
+      CAT.idAnalise = idx; CAT.analisando = true; CAT.analise = null; render();
+      jina(p.u)
+        .then(function(md){
+          var det = parseProduto(md, { nome: p.n, img: p.i, url: p.u });
+          if(!det.tiers.length) throw new Error("o fornecedor não mostrou preço nesta página");
+          CAT.analise = analisarItem(det, cfgScan());
+          CAT.analise.item.img = det.imagem || p.i;
+        })
+        .catch(function(e){
+          CAT.analise = null;
+          CAT.erro = "Falhou em " + p.n + ": " + e.message;
+        })
+        .then(function(){ CAT.analisando = false; render(); });
+    },
+    aplicarAoCatalogo: function(idx){
+      if(!CAT.analise) return;
+      aplicarProdutoAoMeuCatalogo(CAT.analise);
+      CAT.analise = null; render();
+    },
+    copiarAnuncio: function(idx, canal){
+      if(!CAT.analise) return;
+      var an = gerarAnuncio(CAT.analise, canal);
+      var txt = an.titulo + "\n\n" + an.descricao + "\n\n" + an.hashtags + "\n\nPreço: " + brl(an.preco);
+      if(navigator.clipboard) navigator.clipboard.writeText(txt);
+      logScan("Anúncio " + canal + " copiado.");
+      render();
+    },
+  };
+
+  try {
+    var inicial = ("" + location.hash).replace("#","");
+    if(inicial && ABAS.some(function(a){ return a[0] === inicial; })) aba = inicial;
+  } catch(e){}
+  window.addEventListener("hashchange", function(){
+    var h = ("" + location.hash).replace("#","");
+    if(ABAS.some(function(a){ return a[0] === h; })){ aba = h; render(); }
+  });
+  carregarCatalogo();
   render();
   autoExecutar();
 })();

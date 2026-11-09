@@ -595,8 +595,21 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
     { nome:"Mochila Escolar Infantil Estampada Com Lancheira E Estojo", ref:"225739", vendidos:6200, nota:4.7, referencia:108.62, tiers:[[1,86.9],[4,84.29],[8,82.56],[10,78.21]], img:"https://cdn.feiradamadrugadasp.com.br/img/p/2/3/3/3/3/4/233343-home_default.jpg", url:"https://www.feiradamadrugadasp.com.br/mochila-escolar-infantil-estampada-com-lancheira-e-estojo/p" }
   ];
 
-  function jina(url){
+  function esperar(ms){
+    return new Promise(function(res){ setTimeout(res, ms); });
+  }
+
+  // o leitor gratuito aceita ~20 leituras por minuto; 429 vira espera e nova tentativa
+  function jina(url, tentativa){
+    var t = tentativa || 0;
     return fetch(LEITOR + url, { headers: { "Accept": "text/plain" } }).then(function(r){
+      if(r.status === 429 && t < 3){
+        var pausa = 6000 * (t + 1);
+        return esperar(pausa).then(function(){
+          if(SCAN.estado === "rodando") logScan("Leitor pediu pausa, esperando " + (pausa / 1000) + "s para tentar de novo");
+          return jina(url, t + 1);
+        });
+      }
       if(!r.ok) throw new Error("leitor HTTP " + r.status);
       return r.text();
     });
@@ -818,7 +831,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
       orcamento: num((document.getElementById("s-orcamento") || {}).value) || 1000,
       qtd: num((document.getElementById("s-qtd") || {}).value) || 1,
       markup: num((document.getElementById("s-markup") || {}).value) || 3,
-      detalhar: num((document.getElementById("s-detalhar") || {}).value) || 8
+      detalhar: num((document.getElementById("s-detalhar") || {}).value) || 6
     };
     SCAN = { estado: "rodando", log: [], itens: [], erro: "", quando: null, alvo: cfg, fonte: "" };
     logScan("Conectando ao fornecedor " + FORNECEDOR.replace("https://www.", ""));
@@ -842,7 +855,8 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
                 if(an) SCAN.itens.push(an);
                 render();
               })
-              .catch(function(e){ logScan("Falhou em " + prod.nome.slice(0, 34) + " (" + e.message + ")"); });
+              .catch(function(e){ logScan("Falhou em " + prod.nome.slice(0, 34) + " (" + e.message + ")"); })
+              .then(function(){ return esperar(1500); });
           });
         });
         return seq;
@@ -890,7 +904,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
   }
 
   function telaEscanear(){
-    var cfg = SCAN.alvo || { meta: 30, orcamento: 1000, qtd: 1, detalhar: 8 };
+    var cfg = SCAN.alvo || { meta: 30, orcamento: 1000, qtd: 1, detalhar: 6 };
     var html = '<div class="sec"><h3>Escanear fornecedor</h3>'
       + '<div class="hint" style="margin-top:0;margin-bottom:12px">Lê a vitrine de mais vendidos da Feira da Madrugada SP, abre cada produto, pega o custo real por faixa de quantidade e compara a margem em Shopee, Mercado Livre e TikTok Shop.</div>'
       + '<div class="form">'
@@ -962,7 +976,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
         + '<td><span class="pill ' + (a.risco.nivel === "baixo" ? "p-ok" : a.risco.nivel === "medio" ? "p-warn" : "p-err") + '">' + a.risco.nivel + '</span><div class="sub">' + esc(a.risco.motivo) + '</div></td></tr>';
     });
     html += '</tbody></table></div>'
-      + '<div class="hint">Faixas de preço por quantidade já aplicadas ao custo. Preço de venda = custo × multiplicador (padrão 3x), porque o preço do fornecedor é de atacado. Comissões: Shopee 14% + R$ 4 · Mercado Livre 13% + R$ 6 (abaixo de R$ 79) · TikTok Shop 6% + R$ 6 a partir de R$ 50 (abaixo disso, 10% + R$ 4). Frete não incluído. O ranking desconta o risco (volumoso, sazonal, elétrico, frágil) do lucro. Confira as taxas na sua conta antes de comprar.</div></div>';
+      + '<div class="hint">Faixas de preço por quantidade já aplicadas ao custo. Preço de venda = custo × multiplicador (padrão 3x), porque o preço do fornecedor é de atacado. Comissões: Shopee 14% + R$ 4 · Mercado Livre 13% + R$ 6 (abaixo de R$ 79) · TikTok Shop 6% + R$ 6 a partir de R$ 50 (abaixo disso, 10% + R$ 4). Frete não incluído. O ranking desconta o risco (volumoso, sazonal, elétrico, frágil) do lucro. Se o leitor pedir pausa, a varredura espera e continua sozinha. Confira as taxas na sua conta antes de comprar.</div></div>';
     return html;
   }
 

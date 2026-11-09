@@ -13,6 +13,8 @@ from pydantic import BaseModel, Field
 from agents.base import MarketContext
 from analytics.profitability import FinancialInput, calculate, compare_marketplaces
 from analytics.product_score import ScoreInput, score_product
+from analytics import fees as marketplace_fees
+from analytics import listing_factory, suppliers
 from api.deps import get_orchestrator
 from core.utils import local_now
 from integrations import APIError, NotConfigured, build_connector, connector_statuses
@@ -401,3 +403,67 @@ def clear_demo_data() -> dict[str, Any]:
     removed = clear_demo(orch.repo)
     orch.permissions.audit("proprietario", "demo_clear", "demo", "", {"removed": removed})
     return {"ok": True, "removed": removed}
+
+
+# ---------- novas rotas: taxas, fornecedores, anúncios ----------
+
+
+@router.get("/marketplaces/taxas")
+def taxas_marketplace() -> dict[str, Any]:
+    """Tabelas de taxa vigentes com fonte, data de coleta e o que falta confirmar."""
+    return {"tabelas": marketplace_fees.resumo_tabelas(), "canais": list(marketplace_fees.CANAIS)}
+
+
+class MargemBody(BaseModel):
+    canal: str
+    preco: float = Field(..., gt=0)
+    custo_total: float = Field(..., ge=0)
+
+
+@router.post("/marketplaces/margem")
+def margem_marketplace(body: MargemBody) -> dict[str, Any]:
+    """Margem líquida determinística de um item em um canal."""
+    try:
+        return marketplace_fees.margem(body.canal, body.preco, body.custo_total)
+    except ValueError as erro:
+        raise HTTPException(status_code=400, detail=str(erro)) from erro
+
+
+@router.get("/fornecedores/meta")
+def fornecedores_meta() -> dict[str, Any]:
+    try:
+        return suppliers.meta()
+    except suppliers.FornecedorIndisponivel as erro:
+        raise HTTPException(status_code=404, detail=str(erro)) from erro
+
+
+@router.get("/fornecedores/busca")
+def fornecedores_busca(termo: str, limite: int = 20, apenas_com_preco: bool = False) -> list[dict[str, Any]]:
+    """Busca no catálogo do fornecedor com link direto e lacunas declaradas."""
+    return [item.para_dict() for item in suppliers.buscar(termo, limite=limite, apenas_com_preco=apenas_com_preco)]
+
+
+@router.get("/fornecedores/melhor-oferta")
+def fornecedores_melhor_oferta(termo: str, quantidade: int = 1) -> dict[str, Any]:
+    resultado = suppliers.melhor_oferta(termo, quantidade=quantidade)
+    if resultado is None:
+        raise HTTPException(status_code=404, detail="produto não encontrado no catálogo")
+    return resultado
+
+
+class AnuncioBody(BaseModel):
+    nome: str
+    custo: float | None = None
+    categoria: str | None = None
+    imagem: str | None = None
+    peso_kg: float | None = None
+    margem_alvo_pct: float = 30.0
+
+
+@router.post("/anuncios/gerar")
+def gerar_anuncios(body: AnuncioBody) -> dict[str, Any]:
+    """Gera as três versões do anúncio e mostra qual canal paga melhor."""
+    try:
+        return listing_factory.gerar_todos(body.model_dump(), margem_alvo_pct=body.margem_alvo_pct)
+    except ValueError as erro:
+        raise HTTPException(status_code=400, detail=str(erro)) from erro

@@ -39,3 +39,6 @@ Thumbs.db
 # banco local (não versionar)
 data/empire.db
 data/empire.db-*
+
+# artefatos gerados pelo pipeline de oportunidades (vídeos, imagens baixadas)
+saida/

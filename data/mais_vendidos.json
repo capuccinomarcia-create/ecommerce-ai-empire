@@ -1,0 +1,41 @@
+{
+  "fonte": "resultados de busca do Google (páginas de Shopee e Mercado Livre indexadas)",
+  "coletado_em": "2026-11-09",
+  "anuncios": [
+    {
+      "canal": "Shopee",
+      "titulo": "Kit Maleta Montagem Educativa Infantil Brinquedo Criativo Educacional Sortido",
+      "preco": 81.25,
+      "link": "https://shopee.com.br/Kit-Maleta-Montagem-Educativa-Infantil-Brinquedo-Criativo-Educacional-Sortido-i.252885214.58255159574"
+    },
+    {
+      "canal": "Shopee",
+      "titulo": "Brinquedo Educativo de Montagem com Maleta e Furadeira Pecas para Criancas",
+      "preco": 78.97,
+      "avaliacoes": 119,
+      "link": "https://shopee.com.br/Brinquedo-Educativo-de-Montagem-com-Maleta-e-Furadeira-Pe%C3%A7as-para-Crian%C3%A7as-i.1674573592.58254622493"
+    },
+    {
+      "canal": "Shopee",
+      "titulo": "Kit Educativo Montagem Brinquedo Infantil Criativo e Didatico Sortido Pronta Entrega",
+      "preco": 83.3,
+      "link": "https://shopee.com.br/Kit-Educativo-Montagem-Brinquedo-Infantil-Criativo-e-Did%C3%A1tico-S%C3%B3rtido-Pronta-Entrega-i.791143935.22194918316"
+    },
+    {
+      "canal": "Mercado Livre",
+      "titulo": "Brinquedo Infantil Educativo 52 Blocos De Montar Coloridos",
+      "link": "https://www.mercadolivre.com.br/brinquedo-infantil-educativo-52-blocos-de-montar-coloridos/up/MLBU2934712357"
+    },
+    {
+      "canal": "Mercado Livre",
+      "titulo": "Mesa Infantil Mesinha Didatica Divertida Brinquedo Criancas Educacional Atividades De Montar",
+      "link": "https://lista.mercadolivre.com.br/brinquedo-de-montar-infantil"
+    },
+    {
+      "canal": "Mercado Livre",
+      "titulo": "Trem De Madeira Montessori Articulado Para Encaixar Formas Geometricas",
+      "preco": 55.82,
+      "link": "https://lista.mercadolivre.com.br/brinquedos-pedagogico"
+    }
+  ]
+}

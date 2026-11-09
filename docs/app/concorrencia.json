@@ -1,0 +1,71 @@
+{
+ "capturado_em": "09/11/2026 10:50",
+ "fonte": "resultados de busca (Google) das lojas Shopee e Mercado Livre",
+ "nota": "Preço e quantidade vendida como aparecem no anúncio. Não exige login.",
+ "anuncios": [
+  {
+   "canal": "Shopee",
+   "produto": "Livrinho Livro de Colorir Kit 3 unidades",
+   "preco": 51.98,
+   "unidades": 3,
+   "vendidos": 1800,
+   "url": "https://shopee.com.br/Livrinho-Livro-de-Colorir-Kit-3-unidades-Caderno-Pintura-Arte-Desenho-Lazer-Distraçao-Criatividade-Relaxante-i.314875828.22998732116"
+  },
+  {
+   "canal": "Shopee",
+   "produto": "Livro Livrinho de Colorir Pintura Desenho Kit 3 unidades",
+   "preco": 48.26,
+   "unidades": 3,
+   "vendidos": null,
+   "url": "https://shopee.com.br/Livro-Livrinho-de-Colorir-Pintura-Desenho-Kit-3-unidades-Arte-Lazer-Entretenimento-Criatividade-i.390320155.22098751586"
+  },
+  {
+   "canal": "Shopee",
+   "produto": "kit 3 Livro Para Colorir 50 Folhas",
+   "preco": 44.9,
+   "unidades": 3,
+   "vendidos": null,
+   "url": "https://shopee.com.br/kit-3-Livro-Para-Colorir-50-Folhas-Sortida-caderno-desenho-pintura-Coloring-Book-infantil-i.1663605650.58200265348"
+  },
+  {
+   "canal": "Shopee",
+   "produto": "Livros Infantis Kit 2 Atividades 3+",
+   "preco": 29.99,
+   "unidades": 2,
+   "vendidos": null,
+   "url": "https://shopee.com.br/Livros-Infantis-Kit-2-Atividades-3-Colorir-e-Aprender-Sem-Celular-Educativo-i.609437350.58208200308"
+  },
+  {
+   "canal": "Shopee",
+   "produto": "Mega Kit Livro Infantil Colorir 3 Palavrinhas",
+   "preco": 29.9,
+   "unidades": 1,
+   "vendidos": null,
+   "url": "https://shopee.com.br/Mega-Kit-Livro-Infantil-Colorir-3-Palavrinhas-Ler-colorir-e-brincar-Com-Giz-de-Cera-Canetinha-Aquarela-Carimbo-i.399775217.20999183601"
+  },
+  {
+   "canal": "Mercado Livre",
+   "produto": "Livro 100 Amazing Patterns (adulto)",
+   "preco": 18.27,
+   "unidades": 1,
+   "vendidos": null,
+   "url": "https://www.mercadolivre.com.br/livro-100-amazing-patterns-an-adult-coloring-book-with-100/up/MLBU3988516279"
+  },
+  {
+   "canal": "Mercado Livre",
+   "produto": "Kit 2 Caderno de Caligrafia 460 Atividades",
+   "preco": 33.99,
+   "unidades": 2,
+   "vendidos": 100,
+   "url": "https://www.mercadolivre.com.br/kit-2-livros-cartilha-de-alfabetizacao-e-caligrafia-escolar/up/MLBU735015769"
+  },
+  {
+   "canal": "Mercado Livre",
+   "produto": "Kit Com 3 Livros Colorir Magic Kids",
+   "preco": 21.6,
+   "unidades": 3,
+   "vendidos": null,
+   "url": "https://www.mercadolivre.com.br/kit-com-3-livros-colorir--magic-kids/up/MLBU3520724871"
+  }
+ ]
+}

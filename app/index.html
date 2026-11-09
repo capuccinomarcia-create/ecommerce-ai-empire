@@ -1021,6 +1021,21 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
   var CAT = { lista: [], meta: null, filtro: "", cat: "Todos", pagina: 0, porPagina: 24,
               carregando: true, erro: "", analise: null, analisando: false, idAnalise: -1 };
 
+
+  function carregarConcorrencia(){
+    fetch("concorrencia.json").then(function(r){ return r.json(); }).then(function(d){
+      if(!d || !d.anuncios) return;
+      CONC.capturados = d.anuncios.map(function(a){
+        return { id: id(), canal: a.canal, produto: a.produto, preco: num(a.preco),
+                 unidades: num(a.unidades) || 1, vendidos: (a.vendidos == null ? null : num(a.vendidos)),
+                 url: a.url || "", frete: false, quando: d.capturado_em || "" };
+      });
+      CONC.resultado = estrategiaConcorrencia(CONC.capturados);
+      CONC.fonte = d.fonte || "";
+      render();
+    }).catch(function(){});
+  }
+
   function carregarCatalogo(){
     CAT.carregando = true;
     fetch("catalogo.json")
@@ -1455,6 +1470,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
   };
 
   carregarCatalogo();
+  carregarConcorrencia();
   render();
   autoExecutar();
 })();

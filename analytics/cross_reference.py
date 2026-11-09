@@ -25,6 +25,10 @@ VAZIAS = {
     "unidade", "unidades", "pecas", "peca", "pcs", "infantil", "infantis", "novo",
     "nova", "original", "promocao", "envio", "rapido", "gratis", "pronta",
     "entrega", "pronto", "estoque", "grande", "pequeno", "colorido", "sortido",
+    # palavras de categoria que aparecem em milhares de anúncios e criam falso positivo
+    "brinquedo", "brinquedos", "educativo", "educativa", "educacional",
+    "educacionais", "criativo", "criativa", "didatico", "didatica", "montagem",
+    "sortida", "sortidas", "pronta",
 }
 
 

@@ -724,9 +724,9 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
     var mapa = [
       [["caixa de som","fone","headset","microfone","bluetooth"], "Áudio"],
       [["carregador","cabo","power bank","suporte de celular","película"], "Celular e acessórios"],
-      [["mochila","lancheira","estojo","bolsa","carteira","necessaire"], "Bolsas e mochilas"],
-      [["squishy","brinquedo","pião","piao","bloco","bola","carrinho","boneca"], "Brinquedos"],
-      [["lousa","tablet lcd","caderno","diário","caneta","papelaria"], "Papelaria"],
+      [["canetinha","caneta","lápis","lapis","giz","massa de modelar","caderno","diário","lousa","tablet lcd","estojo","papelaria","colorir"], "Papelaria"],
+      [["squishy","brinquedo","pião","piao","bloco","bola","carrinho","boneca","pula pula","peteca"], "Brinquedos"],
+      [["mochila","lancheira","bolsa","carteira","necessaire"], "Bolsas e mochilas"],
       [["panela","grill","sanduicheira","chaleira","air fryer","liquidificador"], "Cozinha"],
       [["furadeira","chave","kit ferramentas","maleta","parafusadeira"], "Ferramentas"],
       [["smartwatch","relógio","relogio"], "Relógios"],
@@ -764,7 +764,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
     var nome = limparNome(item.nome);
     var cat = categoriaDe(nome);
     var beneficios = BENEFICIOS[cat] || BENEFICIOS.Utilidades;
-    var preco = analise.canais[canal].precoMeta || analise.venda;
+    var preco = analise.venda;
     var titulo = nome;
     if(canal === "Mercado Livre") titulo = nome + " - Pronto Entrega";
     if(canal === "Shopee") titulo = nome + " | Envio Rápido";
@@ -780,6 +780,8 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
       "• Produto novo, conferido antes do envio",
       "• Embalagem protegida",
       "• Envio em até 24h úteis após a confirmação",
+      "",
+      "Preço mínimo para bater a meta de margem: R$ " + (analise.canais[canal].precoMeta || 0).toFixed(2).replace(".", ","),
       "",
       "Garantia e troca conforme as regras do marketplace.",
       "",

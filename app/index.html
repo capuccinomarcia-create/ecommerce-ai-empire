@@ -454,7 +454,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
   }
 
   // ---------- render ----------
-  var ABAS = [["painel","Painel"],["escanear","Escanear"],["fornecedor","Fornecedor"],["produtos","Produtos"],["aprovacoes","Aprovações"],["rotinas","Rotinas"],["relatorios","Relatórios"]];
+  var ABAS = [["painel","Painel"],["escanear","Escanear"],["concorrencia","Concorrência"],["fornecedor","Fornecedor"],["produtos","Produtos"],["aprovacoes","Aprovações"],["rotinas","Rotinas"],["relatorios","Relatórios"]];
 
   function render(){
     try {
@@ -466,6 +466,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
     var v = document.getElementById("view");
     v.innerHTML = aba==="painel" ? telaPainel()
       : aba==="escanear" ? telaEscanear()
+      : aba==="concorrencia" ? telaConcorrencia()
       : aba==="fornecedor" ? telaFornecedor()
       : aba==="produtos" ? telaProdutos()
       : aba==="aprovacoes" ? telaAprovacoes()
@@ -1191,6 +1192,268 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
     var h = ("" + location.hash).replace("#","");
     if(ABAS.some(function(a){ return a[0] === h; })){ aba = h; render(); }
   });
+  // ---------- concorrência: lê o que foi copiado do marketplace ----------
+  function fmt(n){ return n == null ? "—" : Number(n).toLocaleString("pt-BR"); }
+
+  var CONC = { lista: [], canal: "Mercado Livre", bruto: "", erro: "", alvo: null };
+
+  function numVendidos(txt){
+    var t = txt.toLowerCase().replace(/\s+/g, " ");
+    var m = t.match(/([\d\.,]+)\s*(mil|k)?\s*vendid/);
+    if(!m){
+      m = t.match(/vendid[oa]s?\s*:?\s*([\d\.,]+)\s*(mil|k)?/);
+      if(!m) return null;
+      var n2 = Number(m[1].replace(/\./g, "").replace(",", "."));
+      if(m[2]) n2 = n2 * 1000;
+      return Math.round(n2);
+    }
+    var n = Number(m[1].replace(/\./g, "").replace(",", "."));
+    if(m[2]) n = n * 1000;
+    return Math.round(n);
+  }
+
+  function unidadesDe(txt){
+    var t = txt.toLowerCase();
+    var padroes = [
+      /kit\s*(?:com|de)?\s*(\d{1,3})/, /pacote\s*(?:com|de)?\s*(\d{1,3})/,
+      /combo\s*(?:com|de)?\s*(\d{1,3})/, /(\d{1,3})\s*(?:unidades|unid|pe[çc]as|livros|und)\b/,
+      /(\d{1,3})\s*x\s*(?:livro|unidade|pe[çc]a)/, /atacado.*?(\d{1,3})/
+    ];
+    for(var i = 0; i < padroes.length; i++){
+      var m = t.match(padroes[i]);
+      if(m){
+        var n = Number(m[1]);
+        if(n >= 2 && n <= 200) return n;
+      }
+    }
+    return 1;
+  }
+
+  function precoDe(txt){
+    var m = String(txt).match(/R\$\s*([\d\.]+,\d{2})/);
+    return m ? brNum(m[1]) : null;
+  }
+
+  function parseColagem(texto){
+    var linhas = String(texto || "").split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean);
+    var achados = [], pendente = "";
+    for(var i = 0; i < linhas.length; i++){
+      var l = linhas[i];
+      var p = precoDe(l);
+      var v = numVendidos(l);
+      if(!p && achados.length){
+        var vendaSozinha = numVendidos(l);
+        var ultimo = achados[achados.length - 1];
+        if(vendaSozinha != null && ultimo.vendidos == null){
+          ultimo.vendidos = vendaSozinha;
+          pendente = "";
+          continue;
+        }
+        if(/frete\s*gr[áa]tis/i.test(l)){ ultimo.frete = "grátis"; pendente = ""; continue; }
+      }
+      if(p && p > 0){
+        var nome = pendente && pendente.length > 6 ? pendente : (l.replace(/R\$[\s\S]*/, "").trim() || "Anúncio");
+        if(nome.length > 90) nome = nome.slice(0, 90);
+        var vendidosLinha = v != null ? v : numVendidos(pendente);
+        achados.push({
+          id: id(),
+          nome: nome,
+          preco: p,
+          vendidos: vendidosLinha,
+          unidades: unidadesDe(nome + " " + l),
+          canal: CONC.canal,
+          frete: /frete gr[áa]tis/i.test(l + " " + pendente) ? "grátis" : "",
+          quando: agora()
+        });
+        pendente = "";
+      } else {
+        pendente = l;
+      }
+    }
+    // dedupe por nome + preço
+    var vistos = {}, saida = [];
+    achados.forEach(function(a){
+      var k = a.nome.toLowerCase() + "|" + a.preco;
+      if(!vistos[k]){ vistos[k] = 1; saida.push(a); }
+    });
+    return saida;
+  }
+
+  function concDoCanal(canal){
+    return CONC.lista.filter(function(c){ return !canal || c.canal === canal; });
+  }
+
+  function resumoConc(canal){
+    var lista = concDoCanal(canal).filter(function(c){ return c.vendidos != null; });
+    if(!lista.length) return null;
+    var precos = lista.map(function(c){ return c.preco; }).sort(function(a, b){ return a - b; });
+    var unidade = lista.map(function(c){ return c.preco / (c.unidades || 1); }).sort(function(a, b){ return a - b; });
+    var lider = lista.slice().sort(function(a, b){ return b.vendidos - a.vendidos; })[0];
+    var comKit = lista.filter(function(c){ return (c.unidades || 1) > 1; });
+    var mediana = precos[Math.floor(precos.length / 2)];
+    return {
+      canal: canal,
+      anuncios: lista.length,
+      medianaPreco: mediana,
+      medianaUnidade: unidade[Math.floor(unidade.length / 2)],
+      menorPreco: precos[0],
+      maiorPreco: precos[precos.length - 1],
+      liderNome: lider.nome,
+      liderVendidos: lider.vendidos,
+      liderPreco: lider.preco,
+      liderUnidades: lider.unidades || 1,
+      liderUnidade: +(lider.preco / (lider.unidades || 1)).toFixed(2),
+      kits: comKit.length,
+      totalVendidos: lista.reduce(function(s, c){ return s + c.vendidos; }, 0)
+    };
+  }
+
+  function estrategia(item, resumo, cfg){
+    if(!resumo) return null;
+    var meta = cfg.meta / 100;
+    var custo = item.custo;
+    var canal = resumo.canal;
+    // preço de ataque: 3% abaixo do líder (ou 5% abaixo da mediana), nunca abaixo do piso de margem
+    var alvo = Math.min(resumo.liderUnidade * 0.97, resumo.medianaUnidade * 0.95);
+    var piso = Math.max(precoParaMeta(custo, canal, meta), custo * 1.4);
+    var viavel = alvo >= piso;
+    var precoFinal = viavel ? alvo : piso;
+    var unidKit = 3;
+    var precoKit = +(precoFinal * unidKit * 0.9).toFixed(2); // kit com 10% de desconto no total
+    var margemKit = +(((precoKit - tarifa(canal, precoKit) - custo * unidKit) / precoKit) * 100).toFixed(1);
+    var ganhaEmVolume = resumo.kits >= Math.max(2, Math.ceil(resumo.anuncios / 2));
+    var comissao = canal === "Shopee" ? 0.14 : canal === "Mercado Livre" ? 0.13 : (resumo.liderPreco < 50 ? 0.10 : 0.06);
+    var fixo = canal === "Shopee" ? 4 : canal === "Mercado Livre" ? (resumo.liderPreco < 79 ? 6 : 0) : (resumo.liderPreco < 50 ? 4 : 6);
+    var custoMaximo = +(resumo.liderPreco * (1 - comissao - meta) - fixo).toFixed(2);
+    return {
+      canal: canal,
+      custoMaximo: custoMaximo,
+      ataque: viavel ? "ganha no preço" : "não fecha margem nesse preço",
+      precoAtaque: +precoFinal.toFixed(2),
+      piso: +piso.toFixed(2),
+      viavel: viavel,
+      diferenca: +(resumo.liderUnidade - precoFinal).toFixed(2),
+      kit: { unidades: unidKit, preco: precoKit, margem: margemKit },
+      rivalUsaKit: ganhaEmVolume,
+      vendidosLider: resumo.liderVendidos,
+      precisaVender: Math.ceil(resumo.liderVendidos / 30)
+    };
+  }
+
+  function telaConcorrencia(){
+    var canais = ["Mercado Livre", "Shopee", "TikTok Shop"];
+    var resumos = canais.map(function(c){ return resumoConc(c); }).filter(Boolean);
+    var html = "";
+
+    html += '<div class="card"><div class="row"><h3 style="margin:0">Concorrência por plataforma</h3>'
+         + '<span class="pill">' + CONC.lista.length + " anúncios capturados</span></div>"
+         + '<p class="muted" style="margin:8px 0 0">Mercado Livre, Shopee e TikTok Shop exigem conta logada e bloqueiam leitura automática. '
+         + "Copie o resultado da busca no app ou no site, cole abaixo e o motor extrai preço, vendidos e se o anúncio é kit.</p></div>";
+
+    html += '<div class="card"><div class="row">'
+         + '<label class="muted">Plataforma</label><select id="c-canal">'
+         + canais.map(function(c){ return '<option' + (CONC.canal === c ? " selected" : "") + ">" + c + "</option>"; }).join("")
+         + "</select></div>"
+         + '<textarea id="c-bruto" rows="6" placeholder="Cole aqui os anúncios copiados. Exemplo:&#10;Livro de Colorir Adulto 100 Desenhos&#10;R$ 24,90&#10;+1000 vendidos&#10;Frete grátis" style="width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid var(--linha);background:var(--fundo2);color:var(--texto);font-family:inherit;font-size:13px">'
+         + esc(CONC.bruto) + "</textarea>"
+         + '<div class="row" style="margin-top:10px;gap:8px;flex-wrap:wrap">'
+         + '<button class="btn primario" onclick="EMF.capturar()">Capturar anúncios</button>'
+         + '<button class="btn primario" onclick="EMF.verEstrategia()">Calcular minha estratégia</button>'
+         + '<button class="btn" onclick="EMF.limparConc()">Limpar capturados</button>'
+         + (CONC.erro ? '<span class="pill ruim">' + esc(CONC.erro) + "</span>" : "")
+         + "</div></div>";
+
+    if(resumos.length){
+      html += '<div class="card"><h3 style="margin:0 0 10px">Onde você ganha</h3>'
+           + '<div class="grade">'
+           + resumos.map(function(r){
+               return kpi(r.canal, brl(r.medianaUnidade), r.anuncios + " anúncios · líder com " + fmt(r.liderVendidos) + " vendidos", "");
+             }).join("")
+           + "</div></div>";
+    }
+
+    if(CONC.alvo){
+      var a = CONC.alvo;
+      html += '<div class="card"><div class="row"><h3 style="margin:0">Estratégia para ' + esc(a.item) + "</h3>"
+           + '<span class="pill ' + (a.viavel ? "ok" : "ruim") + '">' + esc(a.ataque) + "</span></div>"
+           + '<div class="grade" style="margin-top:10px">'
+           + kpi("Preço de ataque", brl(a.precoAtaque), "líder cobra " + brl(a.resumo.liderUnidade) + " por unidade")
+           + kpi("Piso de margem", brl(a.piso), "margem alvo de " + a.cfg.meta + "%")
+           + kpi("Diferença", brl(Math.abs(a.diferenca)), a.diferenca > 0 ? "abaixo do líder" : "acima do líder")
+           + kpi("Kit sugerido", a.kit.unidades + " un por " + brl(a.kit.preco), "margem " + pct(a.kit.margem))
+           + kpi("Custo máximo p/ vencer", brl(a.custoMaximo), "para bater o preço do líder com " + a.cfg.meta + "% de margem")
+           + "</div>"
+           + '<p class="muted" style="margin:12px 0 0">Para passar o líder em volume você precisa de cerca de '
+           + fmt(a.precisaVender) + " vendas por dia. " + (a.rivalUsaKit
+             ? "Os concorrentes já vendem em kit: para ganhar em quantidade, ofereça kit maior com preço por unidade menor."
+             : "Nenhum concorrente relevante vende kit: lançar kit 3 com 10% de desconto no total é o seu diferencial.") + "</p></div>";
+    }
+
+    if(CONC.lista.length){
+      html += '<div class="card"><h3 style="margin:0 0 10px">Anúncios capturados</h3>'
+           + '<div style="overflow-x:auto"><table><thead><tr><th>Anúncio</th><th>Plataforma</th><th>Preço</th><th>Un.</th><th>Por unidade</th><th>Vendidos</th><th></th></tr></thead><tbody>'
+           + CONC.lista.slice().sort(function(x, y){ return (y.vendidos || 0) - (x.vendidos || 0); }).map(function(c, i){
+               return "<tr><td>" + esc(c.nome.slice(0, 58)) + "</td><td>" + esc(c.canal) + "</td><td>" + brl(c.preco)
+                 + "</td><td>" + (c.unidades || 1) + "</td><td>" + brl(c.preco / (c.unidades || 1))
+                 + "</td><td>" + (c.vendidos != null ? fmt(c.vendidos) : "—") + "</td>"
+                 + '<td><button class="btn" onclick="EMF.apagarConc(' + i + ')">remover</button></td></tr>';
+             }).join("")
+           + "</tbody></table></div></div>";
+    }
+    return html;
+  }
+
+  window.EMF = {
+    capturar: function(){
+      var el = document.getElementById("c-canal");
+      if(el) CONC.canal = el.value;
+      var ta = document.getElementById("c-bruto");
+      CONC.bruto = ta ? ta.value : "";
+      var achados = parseColagem(CONC.bruto);
+      if(!achados.length){
+        CONC.erro = "Não encontrei preço no texto colado";
+      } else {
+        CONC.erro = "";
+        CONC.lista = CONC.lista.concat(achados);
+        CONC.bruto = "";
+        aviso(achados.length + " anúncio(s) capturado(s) em " + CONC.canal + ".");
+      }
+      render();
+    },
+    limparConc: function(){
+      CONC.lista = []; CONC.bruto = ""; CONC.erro = ""; CONC.alvo = null;
+      render();
+    },
+    apagarConc: function(i){
+      var ordenado = CONC.lista.slice().sort(function(x, y){ return (y.vendidos || 0) - (x.vendidos || 0); });
+      var alvo = ordenado[i];
+      CONC.lista = CONC.lista.filter(function(c){ return c !== alvo; });
+      render();
+    },
+    verEstrategia: function(){
+      var canais = ["Mercado Livre", "Shopee", "TikTok Shop"];
+      var resumos = canais.map(function(c){ return resumoConc(c); }).filter(Boolean);
+      if(!resumos.length){ CONC.erro = "Capture anúncios antes de calcular"; render(); return; }
+      var campoCusto = document.getElementById("c-custo");
+      CONC.custo = campoCusto ? campoCusto.value : CONC.custo;
+      var produto = estado.produtos[0];
+      var custo = num(CONC.custo) || (produto ? num(produto.custo) : 0);
+      if(!custo){ aviso("Informe seu custo por unidade."); return; }
+      produto = { nome: produto ? produto.nome : "Produto analisado", custo: custo };
+      var resumo = resumos.slice().sort(function(a, b){ return a.medianaUnidade - b.medianaUnidade; })[0];
+      var item = { nome: produto.nome, custo: num(produto.custo) };
+      CONC.alvo = {
+        item: produto.nome,
+        cfg: { meta: num(estado.config.meta) || 30 },
+        resumo: resumo,
+        canal: resumo.canal
+      };
+      var e = estrategia(item, resumo, CONC.alvo.cfg);
+      Object.keys(e).forEach(function(k){ CONC.alvo[k] = e[k]; });
+      render();
+    }
+  };
+
   carregarCatalogo();
   render();
   autoExecutar();

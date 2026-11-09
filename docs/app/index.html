@@ -454,7 +454,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
   }
 
   // ---------- render ----------
-  var ABAS = [["painel","Painel"],["produtos","Produtos"],["aprovacoes","Aprovações"],["rotinas","Rotinas"],["relatorios","Relatórios"]];
+  var ABAS = [["painel","Painel"],["escanear","Escanear"],["produtos","Produtos"],["aprovacoes","Aprovações"],["rotinas","Rotinas"],["relatorios","Relatórios"]];
 
   function render(){
     document.getElementById("nav").innerHTML = ABAS.map(function(a){
@@ -462,6 +462,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
     }).join("");
     var v = document.getElementById("view");
     v.innerHTML = aba==="painel" ? telaPainel()
+      : aba==="escanear" ? telaEscanear()
       : aba==="produtos" ? telaProdutos()
       : aba==="aprovacoes" ? telaAprovacoes()
       : aba==="rotinas" ? telaRotinas()
@@ -574,6 +575,426 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
     document.body.appendChild(a); a.click();
     setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 600);
   }
+
+  // ==========================================================
+  // MOTOR DE ESCANEAMENTO DO FORNECEDOR (Feira da Madrugada SP)
+  // Lê a vitrine de mais vendidos e as páginas de produto através
+  // do leitor r.jina.ai, que atravessa o Cloudflare e libera CORS.
+  // ==========================================================
+
+  var LEITOR = "https://r.jina.ai/";
+  var FORNECEDOR = "https://www.feiradamadrugadasp.com.br";
+  var SCAN = { estado: "ocioso", log: [], itens: [], erro: "", quando: null, alvo: null, fonte: "" };
+
+  // catálogo lido em 08/11/2026, usado quando o leitor falha
+  var SNAPSHOT = [
+    { nome:"Caixa De Som Bluetooth Com Microfone Grande Led USB Potente", ref:"226401", vendidos:3800, nota:4.3, referencia:216.24, tiers:[[1,136.99],[4,132.88],[8,130.14],[10,123.29]], img:"https://cdn.feiradamadrugadasp.com.br/img/p/2/3/3/7/2/7/233727-home_default.jpg", url:"https://www.feiradamadrugadasp.com.br/caixa-de-som-bluetooth-com-microfone-grande-led-usb-potente/p" },
+    { nome:"Squishy Cubo De Queijo Macio Alívio Antiestresse De Apertar", ref:"227853", vendidos:9500, nota:4.6, referencia:28, tiers:[[1,17.5],[4,16.98],[8,16.63],[10,15.75]], img:"https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/3/6/8/242368-home_default.jpg", url:"https://www.feiradamadrugadasp.com.br/squishy-cubo-de-queijo-macio-al-vio-antiestresse-de-apertar/p" },
+    { nome:"Fone De Ouvido Sem Fio Kaidi TWS Premium Bluetooth 5.4", ref:"226343", vendidos:8400, nota:4.7, referencia:65, tiers:[[1,49.99],[4,48.49],[8,47.49],[10,44.99]], img:"https://cdn.feiradamadrugadasp.com.br/img/p/2/3/3/3/3/4/233343-home_default.jpg", url:"https://www.feiradamadrugadasp.com.br/-fone-de-ouvido-sem-fio-tws-premium-bluetooth-54/p" },
+    { nome:"Relógio Smartwatch T900 Ultra 49mm Tela Infinita 2 Pulseiras", ref:"226846", vendidos:8600, nota:4.5, referencia:81.12, tiers:[[1,64.9],[4,62.95],[8,61.66],[10,58.41]], img:"https://cdn.feiradamadrugadasp.com.br/img/p/2/3/8/5/1/8/238518-home_default.jpg", url:"https://www.feiradamadrugadasp.com.br/relogio-smartwatch-t900-ultra-49mm-tela-infinita-2-pulseiras/p" },
+    { nome:"Mochila Escolar Infantil Estampada Com Lancheira E Estojo", ref:"225739", vendidos:6200, nota:4.7, referencia:108.62, tiers:[[1,86.9],[4,84.29],[8,82.56],[10,78.21]], img:"https://cdn.feiradamadrugadasp.com.br/img/p/2/3/3/3/3/4/233343-home_default.jpg", url:"https://www.feiradamadrugadasp.com.br/mochila-escolar-infantil-estampada-com-lancheira-e-estojo/p" }
+  ];
+
+  function jina(url){
+    return fetch(LEITOR + url, { headers: { "Accept": "text/plain" } }).then(function(r){
+      if(!r.ok) throw new Error("leitor HTTP " + r.status);
+      return r.text();
+    });
+  }
+
+  function brNum(s){
+    if(!s) return null;
+    var v = parseFloat(String(s).replace(/\./g, "").replace(",", "."));
+    return isFinite(v) ? v : null;
+  }
+
+  // "![Image 1: Nome](cdn.jpg)](https://.../produto/p)" -> {nome, img, url}
+  function parseLista(md){
+    var re = /!\[Image \d+: ([^\]]+?)\]\((https:\/\/cdn[^)]+?\.(?:jpg|jpeg|png|webp))\)\]\((https:\/\/www\.[^)]+?\/p)(?:#[^)]*)?\)/g;
+    var m, vistos = {}, itens = [];
+    while((m = re.exec(md))){
+      var nome = m[1].replace(/\s+\d+$/, "").trim();
+      var url = m[3];
+      if(vistos[url] || nome.length < 12) continue;
+      vistos[url] = 1;
+      itens.push({ nome: nome, img: m[2], url: url });
+    }
+    return itens;
+  }
+
+  // página de produto -> dados de custo, faixas e demanda
+  function parseProduto(md, base){
+    var nome = (md.match(/^#\s+(.+)$/m) || [])[1];
+    var ref = (md.match(/Ref\.?\s+([\d\.]{4,})/) || [])[1] || "";
+    var vend = md.match(/\+ de\s*([\d\.]+)\s*vendidos/);
+    var nota = md.match(/\b([45]\.\d)\s*\+?\s*de\s*[\d\.]+\s*vendidos/);
+    var par = md.match(/R\$\s?([\d\.]+,\d{2})\s*-?\d+\s*%\s*R\$\s?([\d\.]+,\d{2})/);
+    var tiers = [], re = /\|\s*(\d+)\s*(?:-\s*(\d+)|(\+))\s*\|\s*-?\d+\s*%\s*\|\s*R\$\s?([\d\.]+,\d{2})/g, m;
+    while((m = re.exec(md))){
+      tiers.push([parseInt(m[1], 10), brNum(m[4])]);
+    }
+    var imgGrande = (md.match(/!\[Image \d+: [^\]]*\]\((https:\/\/cdn[^)]+?-large_default\.jpg)\)/) || [])[1];
+    var desc = "";
+    var iDesc = md.search(/###?\s*Descri[çc][ãa]o/);
+    if(iDesc > 0){
+      desc = md.slice(iDesc, iDesc + 700).replace(/###?\s*Descri[çc][ãa]o/, "").replace(/\[[^\]]*\]\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
+    }
+    return {
+      nome: (nome || base.nome || "").trim(),
+      url: base.url, img: imgGrande || base.img,
+      ref: ref, vendidos: vend ? parseInt(vend[1].replace(/\./g, ""), 10) : null,
+      nota: nota ? parseFloat(nota[1]) : null,
+      referencia: par ? brNum(par[1]) : null,
+      tiers: tiers.length ? tiers : (par ? [[1, brNum(par[2])]] : []),
+      descricao: desc
+    };
+  }
+
+  function riscoDe(nome){
+    var n = nome.toLowerCase();
+    if(/piscina|inflav|arvore de natal|árvore de natal|colchao|colchão|guarda-roupa|estante|mesa |cadeira/.test(n))
+      return { nivel: "alto", motivo: "volumoso: frete caro e devolução difícil", peso: 0.45 };
+    if(/natal|halloween|pascoa|páscoa|carnaval/.test(n))
+      return { nivel: "alto", motivo: "sazonal: encalha depois da data", peso: 0.55 };
+    if(/127v|220v|110v|eletr/.test(n))
+      return { nivel: "medio", motivo: "elétrico: mais devolução e garantia", peso: 0.75 };
+    if(/vidro|ceramica|cerâmica|porcelana/.test(n))
+      return { nivel: "medio", motivo: "frágil: risco de quebra no envio", peso: 0.8 };
+    return { nivel: "baixo", motivo: "leve e simples de enviar", peso: 1 };
+  }
+
+  function custoFaixa(item, qtd){
+    if(!item.tiers || !item.tiers.length) return null;
+    var preco = item.tiers[0][1];
+    item.tiers.forEach(function(t){ if(qtd >= t[0] && t[1]) preco = t[1]; });
+    return preco;
+  }
+
+  function tarifa(canal, p){
+    if(canal === "Shopee") return 0.14 * p + 4;
+    if(canal === "Mercado Livre") return 0.13 * p + (p < 79 ? 6 : 0);
+    return p < 50 ? 0.10 * p + 4 : 0.06 * p + 6;
+  }
+
+  function precoParaMeta(custo, canal, metaPct){
+    var meta = num(metaPct) / 100, p = Math.max(custo * 1.5, 25);
+    for(var i = 0; i < 60; i++){
+      var com = canal === "Shopee" ? 0.14 : canal === "Mercado Livre" ? 0.13 : (p < 50 ? 0.10 : 0.06);
+      var fixo = canal === "Shopee" ? 4 : (canal === "Mercado Livre" ? (p < 79 ? 6 : 0) : (p < 50 ? 4 : 6));
+      var den = 1 - com - meta;
+      if(den <= 0.02) return null;
+      var novo = (custo + fixo) / den;
+      if(Math.abs(novo - p) < 0.02){ p = novo; break; }
+      p = novo;
+    }
+    return Math.round(p * 100) / 100;
+  }
+
+  // analisa um produto em todos os canais, no preço de venda de referência
+  function analisarItem(item, cfg){
+    var custo = custoFaixa(item, cfg.qtd);
+    var fator = num(cfg.markup) || 3;
+    var venda = custo ? Math.round(custo * fator * 100) / 100 : 0;
+    if(!custo || !venda) return null;
+    var out = { item: item, custo: custo, venda: venda, canais: {}, qtd: cfg.qtd };
+    ["Shopee", "Mercado Livre", "TikTok Shop"].forEach(function(canal){
+      var lucro = venda - tarifa(canal, venda) - custo;
+      out.canais[canal] = {
+        lucro: Math.round(lucro * 100) / 100,
+        margem: Math.round(lucro / venda * 1000) / 10,
+        precoMeta: precoParaMeta(custo, canal, cfg.meta),
+        viavel: precoParaMeta(custo, canal, cfg.meta) !== null && precoParaMeta(custo, canal, cfg.meta) <= venda
+      };
+    });
+    out.melhor = ["Shopee", "Mercado Livre", "TikTok Shop"].reduce(function(a, b){
+      return out.canais[b].lucro > out.canais[a].lucro ? b : a;
+    }, "Shopee");
+    out.unidades = Math.max(1, Math.floor(num(cfg.orcamento) / custo));
+    out.lucroOrcamento = Math.round(out.unidades * out.canais[out.melhor].lucro * 100) / 100;
+    out.risco = riscoDe(item.nome);
+    out.pontuacao = Math.round(out.lucroOrcamento * out.risco.peso * 100) / 100;
+    out.demanda = item.vendidos || 0;
+    out.referenciaFornecedor = item.referencia || null;
+    out.markup = fator;
+    return out;
+  }
+
+  function categoriaDe(nome){
+    var n = nome.toLowerCase();
+    var mapa = [
+      [["caixa de som","fone","headset","microfone","bluetooth"], "Áudio"],
+      [["carregador","cabo","power bank","suporte de celular","película"], "Celular e acessórios"],
+      [["mochila","lancheira","estojo","bolsa","carteira","necessaire"], "Bolsas e mochilas"],
+      [["squishy","brinquedo","pião","piao","bloco","bola","carrinho","boneca"], "Brinquedos"],
+      [["lousa","tablet lcd","caderno","diário","caneta","papelaria"], "Papelaria"],
+      [["panela","grill","sanduicheira","chaleira","air fryer","liquidificador"], "Cozinha"],
+      [["furadeira","chave","kit ferramentas","maleta","parafusadeira"], "Ferramentas"],
+      [["smartwatch","relógio","relogio"], "Relógios"],
+      [["umidificador","aromatizador","luminária","led"], "Casa"],
+      [["bola de futebol","halteres","yoga","elástico"], "Esporte"]
+    ];
+    for(var i = 0; i < mapa.length; i++){
+      for(var j = 0; j < mapa[i][0].length; j++){
+        if(n.indexOf(mapa[i][0][j]) >= 0) return mapa[i][1];
+      }
+    }
+    return "Utilidades";
+  }
+
+  var BENEFICIOS = {
+    "Áudio": ["Som potente e som limpo no volume alto", "Conexão Bluetooth estável, sem cabo", "Bateria com autonomia para o dia todo", "Compacto: cabe na mochila e vai para qualquer lugar"],
+    "Celular e acessórios": ["Carregamento rápido todos os dias", "Cabo reforçado, não descasca no uso", "Compatível com Android e iPhone", "Compacto para levar na bolsa ou no bolso"],
+    "Bolsas e mochilas": ["Tecido resistente e costura reforçada", "Vários compartimentos organizados", "Alças ajustáveis e confortáveis", "Estampa exclusiva, ótimo para presente"],
+    "Brinquedos": ["Diversão garantida para crianças", "Material firme e seguro", "Ajuda no desenvolvimento e na coordenação", "Ótima opção de presente que cabe no bolso"],
+    "Papelaria": ["Ideal para escola, escritório e presente", "Acabamento caprichado", "Material durável no uso diário", "Compacto para levar na mochila"],
+    "Cozinha": ["Facilita o dia a dia na cozinha", "Acabamento antiaderente e fácil de limpar", "Compacto, ocupa pouco espaço", "Bivolt/127V com uso simples"],
+    "Ferramentas": ["Kit completo para serviços em casa", "Material resistente, uso profissional", "Maleta organizadora inclusa", "Ótimo custo-benefício para quem faz tudo sozinho"],
+    "Relógios": ["Tela ampla e brilhante", "Notificações e monitoramento no pulso", "Bateria para vários dias", "Pulseiras extras no kit"],
+    "Casa": ["Deixa o ambiente mais confortável", "Design moderno que combina com tudo", "Fácil de usar e limpar", "Ótimo para presentear"],
+    "Esporte": ["Perfeito para treino e lazer", "Material resistente", "Fácil de transportar", "Serve para toda a família"],
+    "Utilidades": ["Produto útil no dia a dia", "Bom acabamento", "Preço acessível", "Pronto para envio"]
+  };
+
+  function limparNome(nome){
+    return nome.replace(/\s+/g, " ").replace(/\b(Atacado|Revenda)\b/gi, "").trim();
+  }
+
+  function gerarAnuncio(analise, canal){
+    var item = analise.item;
+    var nome = limparNome(item.nome);
+    var cat = categoriaDe(nome);
+    var beneficios = BENEFICIOS[cat] || BENEFICIOS.Utilidades;
+    var preco = analise.canais[canal].precoMeta || analise.venda;
+    var titulo = nome;
+    if(canal === "Mercado Livre") titulo = nome + " - Pronto Entrega";
+    if(canal === "Shopee") titulo = nome + " | Envio Rápido";
+    if(titulo.length > 60) titulo = titulo.slice(0, 60).trim();
+    var linhas = [
+      nome,
+      "",
+      "Por que vale a pena:",
+    ].concat(beneficios.map(function(b){ return "• " + b; }));
+    linhas = linhas.concat([
+      "",
+      "Detalhes:",
+      "• Produto novo, conferido antes do envio",
+      "• Embalagem protegida",
+      "• Envio em até 24h úteis após a confirmação",
+      "",
+      "Garantia e troca conforme as regras do marketplace.",
+      "",
+      canal === "TikTok Shop"
+        ? "Compre pelo carrinho da loja e receba em casa."
+        : "Clique em comprar e receba em casa."
+    ]);
+    var hashtags = ["#achadinhos", "#promocao", "#" + cat.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z]/g, ""), "#brasil", "#enviorapido"];
+    if(canal === "TikTok Shop") hashtags.unshift("#tiktokshop", "#achadinhosdatiktok");
+    return {
+      titulo: titulo,
+      preco: preco,
+      descricao: linhas.join("\n"),
+      hashtags: hashtags.join(" "),
+      categoria: cat
+    };
+  }
+
+  function textoAnuncio(analise, canal){
+    var a = gerarAnuncio(analise, canal);
+    return "TÍTULO (" + canal + ")\n" + a.titulo + "\n\nPREÇO SUGERIDO\nR$ " + a.preco.toFixed(2).replace(".", ",") + "\n\nDESCRIÇÃO\n" + a.descricao + (canal === "TikTok Shop" ? "\n\n" + a.hashtags : "");
+  }
+
+  // ---------- execução do escaneamento ----------
+  function logScan(msg){
+    SCAN.log.push({ t: new Date().toLocaleTimeString("pt-BR"), m: msg });
+    render();
+  }
+
+  function escanear(){
+    if(SCAN.estado === "rodando") return;
+    var cfg = {
+      meta: num((document.getElementById("s-meta") || {}).value) || 30,
+      orcamento: num((document.getElementById("s-orcamento") || {}).value) || 1000,
+      qtd: num((document.getElementById("s-qtd") || {}).value) || 1,
+      markup: num((document.getElementById("s-markup") || {}).value) || 3,
+      detalhar: num((document.getElementById("s-detalhar") || {}).value) || 8
+    };
+    SCAN = { estado: "rodando", log: [], itens: [], erro: "", quando: null, alvo: cfg, fonte: "" };
+    logScan("Conectando ao fornecedor " + FORNECEDOR.replace("https://www.", ""));
+
+    jina(FORNECEDOR + "/mais-vendidos")
+      .then(function(md){
+        var lista = parseLista(md);
+        if(!lista.length) throw new Error("a vitrine veio vazia");
+        SCAN.fonte = "ao vivo";
+        logScan("Vitrine de mais vendidos lida: " + lista.length + " produtos encontrados");
+        var alvos = lista.slice(0, Math.max(1, Math.min(12, cfg.detalhar)));
+        var seq = Promise.resolve();
+        alvos.forEach(function(prod, idx){
+          seq = seq.then(function(){
+            logScan("Abrindo " + (idx + 1) + "/" + alvos.length + ": " + prod.nome.slice(0, 42));
+            return jina(prod.url)
+              .then(function(pg){
+                var det = parseProduto(pg, prod);
+                if(!det.tiers.length){ logScan("Sem tabela de preço em " + prod.nome.slice(0, 30) + ", pulando"); return; }
+                var an = analisarItem(det, cfg);
+                if(an) SCAN.itens.push(an);
+                render();
+              })
+              .catch(function(e){ logScan("Falhou em " + prod.nome.slice(0, 34) + " (" + e.message + ")"); });
+          });
+        });
+        return seq;
+      })
+      .then(function(){
+        if(!SCAN.itens.length) throw new Error("nenhum produto com preço legível");
+        SCAN.itens.sort(function(a, b){ return b.pontuacao - a.pontuacao; });
+        SCAN.estado = "pronto";
+        SCAN.quando = agora();
+        salvarScan();
+        logScan("Análise concluída: " + SCAN.itens.length + " produtos comparados");
+      })
+      .catch(function(e){
+        SCAN.erro = e.message || String(e);
+        logScan("Falhou: " + SCAN.erro + " — usando catálogo salvo de 08/11");
+        usarSnapshot(cfg);
+      })
+      .then(function(){ render(); });
+  }
+
+  function usarSnapshot(cfg){
+    var itens = SNAPSHOT.map(function(s){ return analisarItem(s, cfg); }).filter(Boolean);
+    itens.sort(function(a, b){ return b.pontuacao - a.pontuacao; });
+    SCAN.itens = itens;
+    SCAN.estado = itens.length ? "pronto" : "falhou";
+    SCAN.fonte = "catálogo salvo (08/11/2026)";
+    SCAN.quando = agora();
+    salvarScan();
+  }
+
+  function salvarScan(){
+    try{
+      localStorage.setItem("empire.scan", JSON.stringify({ itens: SCAN.itens, quando: SCAN.quando, fonte: SCAN.fonte, alvo: SCAN.alvo }));
+    }catch(e){}
+  }
+
+  function carregarScan(){
+    try{
+      var d = JSON.parse(localStorage.getItem("empire.scan") || "null");
+      if(d && d.itens && d.itens.length){
+        SCAN.itens = d.itens; SCAN.quando = d.quando; SCAN.fonte = d.fonte; SCAN.alvo = d.alvo;
+        SCAN.estado = "pronto";
+      }
+    }catch(e){}
+  }
+
+  function telaEscanear(){
+    var cfg = SCAN.alvo || { meta: 30, orcamento: 1000, qtd: 1, detalhar: 8 };
+    var html = '<div class="sec"><h3>Escanear fornecedor</h3>'
+      + '<div class="hint" style="margin-top:0;margin-bottom:12px">Lê a vitrine de mais vendidos da Feira da Madrugada SP, abre cada produto, pega o custo real por faixa de quantidade e compara a margem em Shopee, Mercado Livre e TikTok Shop.</div>'
+      + '<div class="form">'
+      + campo("s-meta", "Margem alvo (%)", "number", cfg.meta)
+      + campo("s-orcamento", "Orçamento (R$)", "number", cfg.orcamento)
+      + campo("s-qtd", "Quantidade que vai comprar", "number", cfg.qtd)
+      + campo("s-markup", "Venda = custo ×", "number", cfg.markup || 3)
+      + campo("s-detalhar", "Produtos para abrir (máx 12)", "number", cfg.detalhar)
+      + '</div><div class="row"><button class="btn" onclick="EMPIRE.escanear()"' + (SCAN.estado === "rodando" ? ' disabled' : '') + '>'
+      + (SCAN.estado === "rodando" ? "Escaneando..." : "Escanear agora") + '</button>'
+      + (SCAN.itens.length ? '<button class="btn ghost" onclick="EMPIRE.limparScan()">Limpar resultado</button>' : '')
+      + '</div>';
+
+    if(SCAN.estado === "rodando" || SCAN.log.length){
+      html += '<div style="margin-top:14px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px;max-height:220px;overflow:auto;font:12.5px/1.7 ui-monospace,SFMono-Regular,monospace;color:var(--mut)">'
+        + SCAN.log.map(function(l){ return '<div>'+l.t+' · '+esc(l.m)+'</div>'; }).join("")
+        + (SCAN.estado === "rodando" ? '<div style="color:var(--acc)">trabalhando...</div>' : '')
+        + '</div>';
+    }
+    if(SCAN.erro) html += '<div class="hint" style="color:var(--warn)">Aviso: '+esc(SCAN.erro)+'</div>';
+    html += '</div>';
+
+    if(!SCAN.itens.length) return html;
+
+    var top = SCAN.itens[0];
+    var canal = top.melhor;
+    var anuncio = gerarAnuncio(top, canal);
+    html += '<div class="sec" style="border-color:#1d4ed8"><h3>Melhor compra agora'
+      + '<span class="pill p-ok" style="margin-left:8px">' + (SCAN.fonte || "ao vivo") + '</span></h3>'
+      + '<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">'
+      + '<img src="' + esc(top.item.img) + '" alt="' + esc(top.item.nome) + '" style="width:150px;height:150px;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:#0f172a" onerror="this.style.display=\'none\'">'
+      + '<div style="flex:1;min-width:240px">'
+      + '<div style="font-size:16px;font-weight:650">' + esc(top.item.nome) + '</div>'
+      + (top.referenciaFornecedor ? '<div class="sub">fornecedor vende a ' + brl(top.referenciaFornecedor) + '</div>' : '')
+      + '<div class="sub">ref ' + esc(top.item.ref || '—') + ' · ' + (top.demanda ? top.demanda.toLocaleString("pt-BR") + ' vendidos' : 'sem dado de venda') + (top.item.nota ? ' · nota ' + top.item.nota : '') + '</div>'
+      + '<div class="grid" style="margin:12px 0 0;grid-template-columns:repeat(auto-fit,minmax(120px,1fr))">'
+      + kpi("Custo un", brl(top.custo), "faixa de " + top.qtd + " un")
+      + kpi("Venda", brl(top.venda), (top.markup || 3) + "x o custo")
+      + kpi("Lucro un", brl(top.canais[canal].lucro), canal, "ok")
+      + kpi("Margem", pct(top.canais[canal].margem), "alvo " + cfg.meta + "%", top.canais[canal].margem >= cfg.meta ? "ok" : "warn")
+      + kpi("Com " + brl(cfg.orcamento), brl(top.lucroOrcamento), top.unidades + " unidades", "acc")
+      + kpi("Risco", top.risco.nivel, top.risco.motivo, top.risco.nivel === "baixo" ? "ok" : "warn")
+      + '</div>'
+      + '<div class="row" style="margin-top:12px">'
+      + '<a class="btn" style="text-decoration:none" href="' + esc(top.item.url) + '" target="_blank" rel="noopener">Abrir no fornecedor</a>'
+      + '<button class="btn ghost" onclick="EMPIRE.aplicarAoCatalogo()">Usar este no catálogo</button>'
+      + '<button class="btn ghost" onclick="EMPIRE.copiarAnuncio(\'' + canal + '\')">Copiar anúncio</button>'
+      + '</div></div></div>';
+
+    html += '<h2 style="margin-top:22px">Anúncio pronto · ' + canal + '</h2>'
+      + '<div style="background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:13px;line-height:1.65;white-space:pre-wrap">'
+      + '<b>' + esc(anuncio.titulo) + '</b>\n'
+      + '<span style="color:var(--ok)">R$ ' + anuncio.preco.toFixed(2).replace(".", ",") + '</span>\n\n'
+      + esc(anuncio.descricao)
+      + (canal === "TikTok Shop" ? '\n\n' + esc(anuncio.hashtags) : '')
+      + '</div></div>';
+
+    html += '<div class="sec"><h3>Comparação nos três canais (' + SCAN.itens.length + ' produtos)</h3><div class="scroll"><table><thead><tr>'
+      + '<th>Produto</th><th class="n">Custo</th><th class="n">Venda</th><th class="n">Shopee</th><th class="n">Mercado Livre</th><th class="n">TikTok</th><th>Melhor</th><th class="n">Lucro c/ orçamento</th><th>Risco</th></tr></thead><tbody>';
+    SCAN.itens.forEach(function(a){
+      html += '<tr><td><b>' + esc(limparNome(a.item.nome).slice(0, 46)) + '</b><div class="sub">' + esc(categoriaDe(a.item.nome)) + (a.demanda ? ' · ' + a.demanda + ' vendidos' : '') + '</div></td>'
+        + '<td class="n">' + brl(a.custo) + '</td><td class="n">' + brl(a.venda) + '</td>'
+        + ['Shopee', 'Mercado Livre', 'TikTok Shop'].map(function(c){
+            var v = a.canais[c];
+            return '<td class="n" style="color:' + (v.margem >= cfg.meta ? 'var(--ok)' : 'var(--warn)') + '">' + brl(v.lucro) + '<div class="sub">' + pct(v.margem) + '</div></td>';
+          }).join("")
+        + '<td><span class="pill p-ok">' + a.melhor + '</span></td>'
+        + '<td class="n">' + brl(a.lucroOrcamento) + '<div class="sub">' + a.unidades + ' un</div></td>'
+        + '<td><span class="pill ' + (a.risco.nivel === "baixo" ? "p-ok" : a.risco.nivel === "medio" ? "p-warn" : "p-err") + '">' + a.risco.nivel + '</span><div class="sub">' + esc(a.risco.motivo) + '</div></td></tr>';
+    });
+    html += '</tbody></table></div>'
+      + '<div class="hint">Faixas de preço por quantidade já aplicadas ao custo. Preço de venda = custo × multiplicador (padrão 3x), porque o preço do fornecedor é de atacado. Comissões: Shopee 14% + R$ 4 · Mercado Livre 13% + R$ 6 (abaixo de R$ 79) · TikTok Shop 6% + R$ 6 a partir de R$ 50 (abaixo disso, 10% + R$ 4). Frete não incluído. O ranking desconta o risco (volumoso, sazonal, elétrico, frágil) do lucro. Confira as taxas na sua conta antes de comprar.</div></div>';
+    return html;
+  }
+
+  window.EMPIRE_EXTRA = {
+    escanear: escanear,
+    limparScan: function(){
+      SCAN = { estado: "ocioso", log: [], itens: [], erro: "", quando: null, alvo: SCAN.alvo, fonte: "" };
+      try{ localStorage.removeItem("empire.scan"); }catch(e){}
+      render();
+    },
+    copiarAnuncio: function(canal){
+      var texto = textoAnuncio(SCAN.itens[0], canal);
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(texto).then(function(){ aviso("Anúncio copiado."); }, function(){ aviso("Não deu para copiar aqui."); });
+      } else {
+        aviso("Copie manualmente o texto acima.");
+      }
+    },
+    aplicarAoCatalogo: function(){
+      var a = SCAN.itens[0];
+      if(!a) return;
+      estado.produtos.unshift({
+        id: id(), nome: limparNome(a.item.nome), custo: a.custo, preco: a.canais[a.melhor].precoMeta || a.venda,
+        estoque: 0, canal: a.melhor === "TikTok Shop" ? "tiktok" : (a.melhor === "Shopee" ? "shopee" : "mercadolivre"),
+        categoria: categoriaDe(a.item.nome), descricaoOk: true, status: "ativo", origem: "feiradamadrugadasp", criado: agora()
+      });
+      salvar(); aviso("Produto adicionado ao catálogo.");
+    }
+  };
+
+  Object.keys(window.EMPIRE_EXTRA).forEach(function(k){ EMPIRE[k] = window.EMPIRE_EXTRA[k]; });
+
+  carregarScan();
+
 
   render();
   autoExecutar();

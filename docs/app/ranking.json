@@ -1,0 +1,839 @@
+{
+ "coletado_em": "2026-11-10T00:58:15+0000",
+ "fonte": "feiradamadrugadasp.com.br (preço e vendidos lidos na página do produto)",
+ "markup": 3.0,
+ "avisos": [
+  "margem calculada com venda = 3x o custo unitário (faixa de 1 a 3 unidades)",
+  "taxas de marketplace ainda provisórias até confirmação no Seller Center"
+ ],
+ "itens": [
+  {
+   "produto": "Mini Projetor Portátil Resolução Ultra HD 4k 130 Polegadas",
+   "url": "https://www.feiradamadrugadasp.com.br/mini-projetor-portatil-resolucao-ultra-hd-4k-130-polegadas-/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/5/3/9/242539-home_default.jpg",
+   "custo": 215.9,
+   "venda": 647.7,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 215.9
+    }
+   ],
+   "vendidos": 1100,
+   "nota": 4.8,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 52.0,
+    "Mercado Livre": 53.7,
+    "TikTok Shop": 59.7
+   },
+   "lucro": {
+    "Shopee": 337.12,
+    "Mercado Livre": 347.6,
+    "TikTok Shop": 386.94
+   }
+  },
+  {
+   "produto": "Caixa De Som Bluetooth Com Microfone Grande Led USB Potente",
+   "url": "https://www.feiradamadrugadasp.com.br/caixa-de-som-bluetooth-com-microfone-grande-led-usb-potente/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/5/3/9/242539-home_default.jpg",
+   "custo": 136.99,
+   "venda": 410.97,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 136.99
+    }
+   ],
+   "vendidos": 3800,
+   "nota": 4.3,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 51.7,
+    "Mercado Livre": 53.7,
+    "TikTok Shop": 59.2
+   },
+   "lucro": {
+    "Shopee": 212.44,
+    "Mercado Livre": 220.55,
+    "TikTok Shop": 243.32
+   }
+  },
+  {
+   "produto": "Mochila Escolar Infantil Estampada Com Lancheira E Estojo",
+   "url": "https://www.feiradamadrugadasp.com.br/mochila-escolar-infantil-estampada-com-lancheira-e-estojo/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/5/3/9/242539-home_default.jpg",
+   "custo": 86.9,
+   "venda": 260.7,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 86.9
+    }
+   ],
+   "vendidos": 6200,
+   "nota": 4.7,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 51.1,
+    "Mercado Livre": 53.7,
+    "TikTok Shop": 58.4
+   },
+   "lucro": {
+    "Shopee": 133.3,
+    "Mercado Livre": 139.91,
+    "TikTok Shop": 152.16
+   }
+  },
+  {
+   "produto": "Kit Maleta Profissional De Ferramentas 200 Peças Resistente",
+   "url": "https://www.feiradamadrugadasp.com.br/kit-maleta-profissional-de-ferramentas-200-pe-as-resistente/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/5/3/9/242539-home_default.jpg",
+   "custo": 87.99,
+   "venda": 263.97,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 87.99
+    }
+   ],
+   "vendidos": 1300,
+   "nota": 4.8,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 51.1,
+    "Mercado Livre": 53.7,
+    "TikTok Shop": 58.4
+   },
+   "lucro": {
+    "Shopee": 135.02,
+    "Mercado Livre": 141.66,
+    "TikTok Shop": 154.14
+   }
+  },
+  {
+   "produto": "Relógio Smartwatch T900 Ultra 49mm Tela Infinita 2 Pulseiras",
+   "url": "https://www.feiradamadrugadasp.com.br/relogio-smartwatch-t900-ultra-49mm-tela-infinita-2-pulseiras/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/5/3/9/242539-home_default.jpg",
+   "custo": 64.9,
+   "venda": 194.7,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 64.9
+    }
+   ],
+   "vendidos": 8600,
+   "nota": 4.5,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 50.6,
+    "Mercado Livre": 53.7,
+    "TikTok Shop": 57.6
+   },
+   "lucro": {
+    "Shopee": 98.54,
+    "Mercado Livre": 104.49,
+    "TikTok Shop": 112.12
+   }
+  },
+  {
+   "produto": "Caixa de Som Bluetooth Portátil com LED À Prova De Água",
+   "url": "https://www.feiradamadrugadasp.com.br/caixa-de-som-bluetooth-portatil-com-led-a-prova-de-agua-/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/5/3/9/242539-home_default.jpg",
+   "custo": 64.9,
+   "venda": 194.7,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 64.9
+    }
+   ],
+   "vendidos": 3100,
+   "nota": 4.4,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 50.6,
+    "Mercado Livre": 53.7,
+    "TikTok Shop": 57.6
+   },
+   "lucro": {
+    "Shopee": 98.54,
+    "Mercado Livre": 104.49,
+    "TikTok Shop": 112.12
+   }
+  },
+  {
+   "produto": "Fone De Ouvido Sem Fio Kaidi TWS Premium Bluetooth 5.4",
+   "url": "https://www.feiradamadrugadasp.com.br/-fone-de-ouvido-sem-fio-tws-premium-bluetooth-54/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/5/3/9/242539-home_default.jpg",
+   "custo": 49.99,
+   "venda": 149.97,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 49.99
+    }
+   ],
+   "vendidos": 8400,
+   "nota": 4.7,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 50.0,
+    "Mercado Livre": 53.7,
+    "TikTok Shop": 56.7
+   },
+   "lucro": {
+    "Shopee": 74.98,
+    "Mercado Livre": 80.48,
+    "TikTok Shop": 84.98
+   }
+  },
+  {
+   "produto": "Mochila Universitária Feminina Estampa De Capivara",
+   "url": "https://www.feiradamadrugadasp.com.br/mochila-universitaria-feminina-estampa-de-capivara/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/5/3/9/242539-home_default.jpg",
+   "custo": 49.99,
+   "venda": 149.97,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 49.99
+    }
+   ],
+   "vendidos": 4500,
+   "nota": 4.4,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 50.0,
+    "Mercado Livre": 53.7,
+    "TikTok Shop": 56.7
+   },
+   "lucro": {
+    "Shopee": 74.98,
+    "Mercado Livre": 80.48,
+    "TikTok Shop": 84.98
+   }
+  },
+  {
+   "produto": "Box 12 Mini Livros Histórias Bíblicas Educacional Infantil",
+   "url": "https://www.feiradamadrugadasp.com.br/box-12-mini-livros-hist-rias-b-blicas-educacional-infantil/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/3/0/2/4/243024-large_default.jpg",
+   "custo": 39.99,
+   "venda": 119.97,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 39.99
+    },
+    {
+     "minimo": 4,
+     "preco": 38.79
+    },
+    {
+     "minimo": 8,
+     "preco": 37.99
+    },
+    {
+     "minimo": 10,
+     "preco": 35.99
+    }
+   ],
+   "vendidos": 5600,
+   "nota": 4.7,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 49.3,
+    "Mercado Livre": 53.7,
+    "TikTok Shop": 55.7
+   },
+   "lucro": {
+    "Shopee": 59.18,
+    "Mercado Livre": 64.38,
+    "TikTok Shop": 66.78
+   }
+  },
+  {
+   "produto": "Livro Bíblico Devocional Conversa Com Deus Pai 384 Páginas",
+   "url": "https://www.feiradamadrugadasp.com.br/livro-b-blico-devocional-conversa-com-deus-pai-384-p-ginas/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/9/8/7/242987-large_default.jpg",
+   "custo": 34.99,
+   "venda": 104.97,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 34.99
+    },
+    {
+     "minimo": 4,
+     "preco": 33.94
+    },
+    {
+     "minimo": 8,
+     "preco": 33.24
+    },
+    {
+     "minimo": 10,
+     "preco": 31.49
+    }
+   ],
+   "vendidos": 4000,
+   "nota": 4.3,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 48.9,
+    "Mercado Livre": 53.7,
+    "TikTok Shop": 55.0
+   },
+   "lucro": {
+    "Shopee": 51.28,
+    "Mercado Livre": 56.33,
+    "TikTok Shop": 57.68
+   }
+  },
+  {
+   "produto": "Carteira Compacta Resistente Masculina Porta Cartões e Documento",
+   "url": "https://www.feiradamadrugadasp.com.br/carteira-compacta-resistente-masculina-porta-cartoes-e-documento/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/5/3/9/242539-home_default.jpg",
+   "custo": 29.99,
+   "venda": 89.97,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 29.99
+    }
+   ],
+   "vendidos": 1700,
+   "nota": 4.6,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 48.2,
+    "Mercado Livre": 53.7,
+    "TikTok Shop": 54.0
+   },
+   "lucro": {
+    "Shopee": 43.38,
+    "Mercado Livre": 48.28,
+    "TikTok Shop": 48.58
+   }
+  },
+  {
+   "produto": "Livro Diário Do Enaldinho Minha Escola É Mal Assombrada",
+   "url": "https://www.feiradamadrugadasp.com.br/livro-di-rio-do-enaldinho-minha-escola-mal-assombrada/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/3/0/5/7/243057-large_default.jpg",
+   "custo": 19.99,
+   "venda": 59.97,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 19.99
+    },
+    {
+     "minimo": 4,
+     "preco": 19.39
+    },
+    {
+     "minimo": 8,
+     "preco": 18.99
+    },
+    {
+     "minimo": 10,
+     "preco": 17.99
+    }
+   ],
+   "vendidos": 8500,
+   "nota": 4.4,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 46.0,
+    "Mercado Livre": 43.7,
+    "TikTok Shop": 50.7
+   },
+   "lucro": {
+    "Shopee": 27.58,
+    "Mercado Livre": 26.18,
+    "TikTok Shop": 30.38
+   }
+  },
+  {
+   "produto": "Squishy Cubo De Queijo Macio Alívio Antiestresse De Apertar",
+   "url": "https://www.feiradamadrugadasp.com.br/squishy-cubo-de-queijo-macio-al-vio-antiestresse-de-apertar/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/5/3/9/242539-home_default.jpg",
+   "custo": 17.5,
+   "venda": 52.5,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 17.5
+    }
+   ],
+   "vendidos": 9500,
+   "nota": 4.6,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 45.0,
+    "Mercado Livre": 42.2,
+    "TikTok Shop": 49.2
+   },
+   "lucro": {
+    "Shopee": 23.65,
+    "Mercado Livre": 22.17,
+    "TikTok Shop": 25.85
+   }
+  },
+  {
+   "produto": "Livro Dale Carnegie Como Fazer Amigos E Influenciar Pessoas",
+   "url": "https://www.feiradamadrugadasp.com.br/livro-dale-carnegie-como-fazer-amigos-e-influenciar-pessoas/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/9/9/6/242996-large_default.jpg",
+   "custo": 16.99,
+   "venda": 50.97,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 16.99
+    },
+    {
+     "minimo": 4,
+     "preco": 16.48
+    },
+    {
+     "minimo": 8,
+     "preco": 16.14
+    },
+    {
+     "minimo": 10,
+     "preco": 15.29
+    }
+   ],
+   "vendidos": 5400,
+   "nota": 4.9,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 44.8,
+    "Mercado Livre": 41.9,
+    "TikTok Shop": 48.9
+   },
+   "lucro": {
+    "Shopee": 22.84,
+    "Mercado Livre": 21.35,
+    "TikTok Shop": 24.92
+   }
+  },
+  {
+   "produto": "Livro  Principis O Alienista Machado De Assis",
+   "url": "https://www.feiradamadrugadasp.com.br/livro-principis-o-alienista-machado-de-assis/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/3/0/1/9/243019-large_default.jpg",
+   "custo": 9.99,
+   "venda": 29.97,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 9.99
+    },
+    {
+     "minimo": 4,
+     "preco": 9.69
+    },
+    {
+     "minimo": 8,
+     "preco": 9.49
+    },
+    {
+     "minimo": 10,
+     "preco": 8.99
+    }
+   ],
+   "vendidos": 1900,
+   "nota": 4.4,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 39.3,
+    "Mercado Livre": 33.6,
+    "TikTok Shop": 43.3
+   },
+   "lucro": {
+    "Shopee": 11.78,
+    "Mercado Livre": 10.08,
+    "TikTok Shop": 12.98
+   }
+  },
+  {
+   "produto": "Pendente Guirlanda De Natal 10cm Com Sino E Laço Vermelho",
+   "url": "https://www.feiradamadrugadasp.com.br/pendente-guirlanda-de-natal-10cm-com-sino-e-la-o-vermelho/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/9/3/1/242931-large_default.jpg",
+   "custo": 8.99,
+   "venda": 26.97,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 8.99
+    },
+    {
+     "minimo": 4,
+     "preco": 8.72
+    },
+    {
+     "minimo": 8,
+     "preco": 8.54
+    },
+    {
+     "minimo": 10,
+     "preco": 8.09
+    }
+   ],
+   "vendidos": 4900,
+   "nota": 4.4,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 37.8,
+    "Mercado Livre": 31.4,
+    "TikTok Shop": 41.8
+   },
+   "lucro": {
+    "Shopee": 10.2,
+    "Mercado Livre": 8.47,
+    "TikTok Shop": 11.28
+   }
+  },
+  {
+   "produto": "Fita Decorativa Natalina Aramada Decoração Natal Vemelha  6cm x 2,7m",
+   "url": "https://www.feiradamadrugadasp.com.br/fita-decorativa-natalina-aramada-decora-o-natal-vemelha-6cm-x-2-7m/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/9/6/8/242968-large_default.jpg",
+   "custo": 7.99,
+   "venda": 23.97,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 7.99
+    },
+    {
+     "minimo": 4,
+     "preco": 7.75
+    },
+    {
+     "minimo": 8,
+     "preco": 7.59
+    },
+    {
+     "minimo": 10,
+     "preco": 7.19
+    }
+   ],
+   "vendidos": 8800,
+   "nota": 4.5,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 36.0,
+    "Mercado Livre": 28.6,
+    "TikTok Shop": 40.0
+   },
+   "lucro": {
+    "Shopee": 8.62,
+    "Mercado Livre": 6.86,
+    "TikTok Shop": 9.58
+   }
+  },
+  {
+   "produto": "Fita Decorativa Natalina Aramada Decoração Natal Dourada Gliter 6cm x 2,7m",
+   "url": "https://www.feiradamadrugadasp.com.br/fita-decorativa-natalina-aramada-decora-o-natal-dourada-6cm-x-2-7m/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/9/6/3/242963-large_default.jpg",
+   "custo": 7.99,
+   "venda": 23.97,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 7.99
+    },
+    {
+     "minimo": 4,
+     "preco": 7.75
+    },
+    {
+     "minimo": 8,
+     "preco": 7.59
+    },
+    {
+     "minimo": 10,
+     "preco": 7.19
+    }
+   ],
+   "vendidos": 8100,
+   "nota": 5.0,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 36.0,
+    "Mercado Livre": 28.6,
+    "TikTok Shop": 40.0
+   },
+   "lucro": {
+    "Shopee": 8.62,
+    "Mercado Livre": 6.86,
+    "TikTok Shop": 9.58
+   }
+  },
+  {
+   "produto": "Capa Porta Cartão Cracha Decorado Bichinhos Fofos Com Mosquetão Removível",
+   "url": "https://www.feiradamadrugadasp.com.br/capa-porta-cart-o-decorado-bichinhos-fofos-com-mosquet-o-remov-vel/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/3/0/0/2/243002-large_default.jpg",
+   "custo": 7.49,
+   "venda": 22.47,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 7.49
+    },
+    {
+     "minimo": 4,
+     "preco": 7.27
+    }
+   ],
+   "vendidos": 1800,
+   "nota": 4.9,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 34.9,
+    "Mercado Livre": 27.0,
+    "TikTok Shop": 38.9
+   },
+   "lucro": {
+    "Shopee": 7.83,
+    "Mercado Livre": 6.06,
+    "TikTok Shop": 8.73
+   }
+  },
+  {
+   "produto": "Sacola De Presente Natalina Saco Embalagem Estampas Natal Douradas G 32x26x10cm",
+   "url": "https://www.feiradamadrugadasp.com.br/sacola-de-presente-natalina-saco-embalagem-estampas-natal-douradas/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/9/4/1/242941-large_default.jpg",
+   "custo": 6.99,
+   "venda": 20.97,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 6.99
+    },
+    {
+     "minimo": 4,
+     "preco": 6.78
+    },
+    {
+     "minimo": 8,
+     "preco": 6.64
+    }
+   ],
+   "vendidos": 4300,
+   "nota": 5.0,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 33.6,
+    "Mercado Livre": 25.0,
+    "TikTok Shop": 37.6
+   },
+   "lucro": {
+    "Shopee": 7.04,
+    "Mercado Livre": 5.25,
+    "TikTok Shop": 7.88
+   }
+  },
+  {
+   "produto": "Capa Porta Cartão Cracha Com Extensor E Orelha De Ursinho Documento",
+   "url": "https://www.feiradamadrugadasp.com.br/capa-porta-cart-o-cracha-com-extensor-e-orelha-de-ursinho-documento/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/3/0/0/6/243006-large_default.jpg",
+   "custo": 6.49,
+   "venda": 19.47,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 6.49
+    },
+    {
+     "minimo": 4,
+     "preco": 6.3
+    },
+    {
+     "minimo": 8,
+     "preco": 6.17
+    },
+    {
+     "minimo": 10,
+     "preco": 5.84
+    }
+   ],
+   "vendidos": 1500,
+   "nota": 4.8,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 32.1,
+    "Mercado Livre": 22.9,
+    "TikTok Shop": 36.1
+   },
+   "lucro": {
+    "Shopee": 6.25,
+    "Mercado Livre": 4.45,
+    "TikTok Shop": 7.03
+   }
+  },
+  {
+   "produto": "Capa Porta Cartão Cracha Com Extensor Simples Documento",
+   "url": "https://www.feiradamadrugadasp.com.br/capa-porta-cart-o-cracha-com-extensor-simples-documento/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/3/0/1/5/243015-large_default.jpg",
+   "custo": 5.49,
+   "venda": 16.47,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 5.49
+    },
+    {
+     "minimo": 4,
+     "preco": 5.33
+    },
+    {
+     "minimo": 8,
+     "preco": 5.22
+    },
+    {
+     "minimo": 10,
+     "preco": 4.94
+    }
+   ],
+   "vendidos": 1200,
+   "nota": 4.7,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 28.4,
+    "Mercado Livre": 17.2,
+    "TikTok Shop": 32.4
+   },
+   "lucro": {
+    "Shopee": 4.67,
+    "Mercado Livre": 2.84,
+    "TikTok Shop": 5.33
+   }
+  },
+  {
+   "produto": "Sacola De Presente Natalina Saco Embalagem Papai Noel 23x18x10cm",
+   "url": "https://www.feiradamadrugadasp.com.br/sacola-de-presente-natalina-saco-embalagem-papai-noel-23x18x10cm/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/8/9/3/242893-large_default.jpg",
+   "custo": 4.99,
+   "venda": 14.97,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 4.99
+    }
+   ],
+   "vendidos": 3600,
+   "nota": 4.9,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 25.9,
+    "Mercado Livre": 13.6,
+    "TikTok Shop": 29.9
+   },
+   "lucro": {
+    "Shopee": 3.88,
+    "Mercado Livre": 2.03,
+    "TikTok Shop": 4.48
+   }
+  },
+  {
+   "produto": "Kit Acessórios De Cabelo Infantil Com Presilhas Piranhas E Xuxinhas",
+   "url": "https://www.feiradamadrugadasp.com.br/kit-acess-rios-de-cabelo-infantil-com-presilhas-piranhas-e-xuxinhas/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/9/3/5/242935-large_default.jpg",
+   "custo": 4.59,
+   "venda": 13.77,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 4.59
+    },
+    {
+     "minimo": 4,
+     "preco": 4.45
+    },
+    {
+     "minimo": 8,
+     "preco": 4.36
+    },
+    {
+     "minimo": 10,
+     "preco": 4.13
+    }
+   ],
+   "vendidos": 6600,
+   "nota": 4.7,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 23.6,
+    "Mercado Livre": 10.1,
+    "TikTok Shop": 27.6
+   },
+   "lucro": {
+    "Shopee": 3.25,
+    "Mercado Livre": 1.39,
+    "TikTok Shop": 3.8
+   }
+  },
+  {
+   "produto": "Chaveiro Mini Tênis Sapato Coloridos Com Cadarço",
+   "url": "https://www.feiradamadrugadasp.com.br/chaveiro-mini-t-nis-sapato-coloridos-com-cadar-o/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/8/8/5/242885-large_default.jpg",
+   "custo": 4.49,
+   "venda": 13.47,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 4.49
+    },
+    {
+     "minimo": 4,
+     "preco": 4.36
+    },
+    {
+     "minimo": 8,
+     "preco": 4.27
+    }
+   ],
+   "vendidos": 4800,
+   "nota": 4.3,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 22.9,
+    "Mercado Livre": 9.1,
+    "TikTok Shop": 26.9
+   },
+   "lucro": {
+    "Shopee": 3.09,
+    "Mercado Livre": 1.23,
+    "TikTok Shop": 3.63
+   }
+  },
+  {
+   "produto": "Chaveiro De Gatinho Feliz Emborrachado Colorido",
+   "url": "https://www.feiradamadrugadasp.com.br/chaveiro-de-gatinho-feliz-emborrachado-colorido/p",
+   "imagem": "https://cdn.feiradamadrugadasp.com.br/img/p/2/4/2/9/7/3/242973-large_default.jpg",
+   "custo": 3.9,
+   "venda": 11.7,
+   "faixas": [
+    {
+     "minimo": 1,
+     "preco": 3.9
+    }
+   ],
+   "vendidos": 5300,
+   "nota": 5.0,
+   "preco_referencia": null,
+   "margens": {
+    "Shopee": 18.5,
+    "Mercado Livre": 2.4,
+    "TikTok Shop": 22.5
+   },
+   "lucro": {
+    "Shopee": 2.16,
+    "Mercado Livre": 0.28,
+    "TikTok Shop": 2.63
+   }
+  }
+ ]
+}

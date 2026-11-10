@@ -454,7 +454,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
   }
 
   // ---------- render ----------
-  var ABAS = [["painel","Painel"],["escanear","Escanear"],["concorrencia","Concorrência"],["fornecedor","Fornecedor"],["produtos","Produtos"],["aprovacoes","Aprovações"],["rotinas","Rotinas"],["relatorios","Relatórios"]];
+  var ABAS = [["painel","Painel"],["ranking","Ranking"],["escanear","Escanear"],["concorrencia","Concorrência"],["fornecedor","Fornecedor"],["produtos","Produtos"],["aprovacoes","Aprovações"],["rotinas","Rotinas"],["relatorios","Relatórios"]];
 
   function render(){
     try {
@@ -467,6 +467,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
     v.innerHTML = aba==="painel" ? telaPainel()
       : aba==="escanear" ? telaEscanear()
       : aba==="concorrencia" ? telaConcorrencia()
+      : aba==="ranking" ? telaRanking()
       : aba==="fornecedor" ? telaFornecedor()
       : aba==="produtos" ? telaProdutos()
       : aba==="aprovacoes" ? telaAprovacoes()
@@ -823,6 +824,104 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
     return "TÍTULO (" + canal + ")\n" + a.titulo + "\n\nPREÇO SUGERIDO\nR$ " + a.preco.toFixed(2).replace(".", ",") + "\n\nDESCRIÇÃO\n" + a.descricao + (canal === "TikTok Shop" ? "\n\n" + a.hashtags : "");
   }
 
+
+  // ---------- RANKING DO FORNECEDOR (maior margem e mais vendidos) ----------
+  var RANK = { lista: [], meta: null, ordem: "margem", carregando: true, erro: "" };
+
+  function carregarRanking(){
+    fetch("ranking.json").then(function(r){ return r.json(); }).then(function(d){
+      RANK.lista = d.itens || [];
+      RANK.meta = { coletado_em: d.coletado_em, fonte: d.fonte, markup: d.markup, avisos: d.avisos || [] };
+      RANK.carregando = false;
+      render();
+    }).catch(function(){
+      RANK.carregando = false;
+      RANK.erro = "ranking.json não carregou";
+      render();
+    });
+  }
+
+  function melhorMargem(l){
+    var c = "TikTok Shop", m = -999;
+    ["Mercado Livre","Shopee","TikTok Shop"].forEach(function(canal){
+      if(l.margens[canal] > m){ m = l.margens[canal]; c = canal; }
+    });
+    return { canal: c, margem: m };
+  }
+
+  function rankOrdenado(){
+    var lista = RANK.lista.slice();
+    if(RANK.ordem === "vendidos"){
+      lista.sort(function(a,b){ return (b.vendidos || 0) - (a.vendidos || 0); });
+    } else if(RANK.ordem === "lucro"){
+      lista.sort(function(a,b){
+        var la = Math.max(a.lucro["Mercado Livre"], a.lucro["Shopee"], a.lucro["TikTok Shop"]);
+        var lb = Math.max(b.lucro["Mercado Livre"], b.lucro["Shopee"], b.lucro["TikTok Shop"]);
+        return lb - la;
+      });
+    } else {
+      lista.sort(function(a,b){ return melhorMargem(b).margem - melhorMargem(a).margem; });
+    }
+    return lista;
+  }
+
+  function telaRanking(){
+    if(RANK.carregando){
+      return '<div class="card"><h3>Ranking do fornecedor</h3>'
+           + '<p class="muted">Carregando preços e vendidos...</p></div>';
+    }
+    if(!RANK.lista.length){
+      return '<div class="card"><h3>Ranking do fornecedor</h3><p class="muted">'
+           + esc(RANK.erro || "sem dados ainda") + '</p></div>';
+    }
+    var lista = rankOrdenado();
+    var top = lista[0];
+    var m = melhorMargem(top);
+    var html = '<div class="card"><div class="row" style="justify-content:space-between;gap:12px;flex-wrap:wrap">'
+      + '<h3 style="margin:0">Ranking do fornecedor</h3>'
+      + '<span class="pill">' + RANK.lista.length + " produtos com margem ≥ 20%</span></div>"
+      + '<p class="muted" style="margin:8px 0 0">Preço e quantidade vendida lidos na página de cada produto. '
+      + "Margem calculada com venda = " + (RANK.meta ? RANK.meta.markup : 3) + "x o custo.</p></div>";
+
+    html += '<div class="grid">'
+      + kpi("Maior margem agora", pct(m.margem), top.produto.slice(0, 34), "ok")
+      + kpi("Custo unitário", brl(top.custo), "faixa 1 a 3 unidades")
+      + kpi("Venda sugerida", brl(top.venda), "≈ 3x o custo")
+      + kpi("Vendidos no fornecedor", fmt(top.vendidos), top.nota ? "nota " + top.nota : "nota não informada")
+      + "</div>";
+
+    html += '<div class="card"><div class="row" style="gap:8px;flex-wrap:wrap">'
+      + '<button class="btn' + (RANK.ordem === "margem" ? " primario" : "") + '" onclick="EMF.rankOrdem(\'margem\')">Maior margem</button>'
+      + '<button class="btn' + (RANK.ordem === "vendidos" ? " primario" : "") + '" onclick="EMF.rankOrdem(\'vendidos\')">Mais vendidos</button>'
+      + '<button class="btn' + (RANK.ordem === "lucro" ? " primario" : "") + '" onclick="EMF.rankOrdem(\'lucro\')">Maior lucro</button>'
+      + '<a class="btn" href="' + esc(top.url) + '" target="_blank" rel="noopener">Abrir fornecedor</a>'
+      + "</div></div>";
+
+    html += '<div class="card"><table class="tabela"><thead><tr>'
+      + "<th>#</th><th>Produto</th><th>Custo</th><th>Venda</th>"
+      + "<th>ML</th><th>Shopee</th><th>TikTok</th><th>Vendidos</th><th></th></tr></thead><tbody>";
+    lista.forEach(function(l, i){
+      var canal = melhorMargem(l).canal;
+      function cel(c){ var v = l.margens[c]; return '<td class="n">' + pct(v) + (c === canal ? " ★" : "") + "</td>"; }
+      html += "<tr><td>" + (i + 1) + "</td>"
+        + '<td><div style="font-weight:600">' + esc(l.produto.slice(0, 52)) + "</div>"
+        + '<div class="muted" style="font-size:11px">' + (l.nota ? "nota " + l.nota : "nota não informada") + "</div></td>"
+        + '<td class="n">' + brl(l.custo) + "</td>"
+        + '<td class="n">' + brl(l.venda) + "</td>"
+        + cel("Mercado Livre") + cel("Shopee") + cel("TikTok Shop")
+        + '<td class="n">' + (l.vendidos == null ? "não informado" : fmt(l.vendidos)) + "</td>"
+        + '<td><a class="btn" style="padding:4px 8px;font-size:12px" href="' + esc(l.url) + '" target="_blank" rel="noopener">Ver</a></td></tr>';
+    });
+    html += "</tbody></table></div>";
+
+    if(RANK.meta && RANK.meta.avisos && RANK.meta.avisos.length){
+      html += '<div class="card"><h3>Avisos</h3><ul class="muted">'
+        + RANK.meta.avisos.map(function(a){ return "<li>" + esc(a) + "</li>"; }).join("")
+        + "</ul></div>";
+    }
+    return html;
+  }
+
   // ---------- execução do escaneamento ----------
   function logScan(msg){
     SCAN.log.push({ t: new Date().toLocaleTimeString("pt-BR"), m: msg });
@@ -1000,6 +1099,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
         aviso("Copie manualmente o texto acima.");
       }
     },
+    rankOrdem: function(o){ RANK.ordem = o; render(); },
     aplicarAoCatalogo: function(){
       var a = SCAN.itens[0];
       if(!a) return;
@@ -1476,6 +1576,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
 
   carregarCatalogo();
   carregarConcorrencia();
+  carregarRanking();
   render();
   autoExecutar();
 })();

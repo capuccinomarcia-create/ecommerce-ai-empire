@@ -454,7 +454,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
   }
 
   // ---------- render ----------
-  var ABAS = [["painel","Painel"],["ranking","Ranking"],["escanear","Escanear"],["concorrencia","Concorrência"],["fornecedor","Fornecedor"],["produtos","Produtos"],["aprovacoes","Aprovações"],["rotinas","Rotinas"],["relatorios","Relatórios"]];
+  var ABAS = [["painel","Painel"],["ranking","Ranking"],["varredura","Varredura"],["escanear","Escanear"],["concorrencia","Concorrência"],["fornecedor","Fornecedor"],["produtos","Produtos"],["aprovacoes","Aprovações"],["rotinas","Rotinas"],["relatorios","Relatórios"]];
 
   function render(){
     try {
@@ -466,6 +466,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
     var v = document.getElementById("view");
     v.innerHTML = aba==="painel" ? telaPainel()
       : aba==="escanear" ? telaEscanear()
+      : aba==="varredura" ? telaVarredura()
       : aba==="concorrencia" ? telaConcorrencia()
       : aba==="ranking" ? telaRanking()
       : aba==="fornecedor" ? telaFornecedor()
@@ -1107,6 +1108,8 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
       try{ localStorage.removeItem("empire.scan"); }catch(e){}
       render();
     },
+    varrBusca: function(v){ VARR.busca = v; render(); },
+    varrOrdem: function(o){ VARR.ordem = o; render(); },
     copiarAnuncio: function(canal){
       var texto = textoAnuncio(SCAN.itens[0], canal);
       if(navigator.clipboard && navigator.clipboard.writeText){
@@ -1137,6 +1140,83 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
   var CAT = { lista: [], meta: null, filtro: "", cat: "Todos", pagina: 0, porPagina: 24,
               carregando: true, erro: "", analise: null, analisando: false, idAnalise: -1 };
 
+
+
+  var VARR = { lista: [], carregando: true, erro: "", busca: "", ordem: "posicao", meta: null, vendidos: {} };
+
+  function carregarVarredura(){
+    fetch("scan_completo.json").then(function(r){ return r.json(); }).then(function(d){
+      VARR.lista = d.itens || []; VARR.meta = d; VARR.carregando = false; render();
+    }).catch(function(){ VARR.carregando = false; VARR.erro = "varredura não carregou"; render(); });
+    fetch("ranking.json").then(function(r){ return r.json(); }).then(function(d){
+      (d.itens || []).forEach(function(i){ if(i.vendidos && i.url) VARR.vendidos[i.url] = i.vendidos; });
+      render();
+    }).catch(function(){});
+  }
+
+  function varrFiltrada(){
+    var t = VARR.busca.toLowerCase();
+    var lista = VARR.lista.filter(function(i){
+      return !t || i.nome.toLowerCase().indexOf(t) >= 0 || (i.categoria || "").toLowerCase().indexOf(t) >= 0;
+    });
+    var ord = VARR.ordem;
+    return lista.slice().sort(function(a, b){
+      if(ord === "desconto") return (b.desconto || 0) - (a.desconto || 0);
+      if(ord === "menor") return a.preco - b.preco;
+      if(ord === "nota") return (b.nota || 0) - (a.nota || 0);
+      return a.posicao - b.posicao;
+    });
+  }
+
+  function telaVarredura(){
+    if(VARR.carregando){
+      return '<div class="card"><h3>Varredura da vitrine</h3><p class="muted">Carregando os produtos varridos...</p></div>';
+    }
+    if(!VARR.lista.length){
+      return '<div class="card"><h3>Varredura da vitrine</h3><p class="muted">' + esc(VARR.erro || "sem dados") + "</p></div>";
+    }
+    var lista = varrFiltrada();
+    var comDesc = VARR.lista.filter(function(i){ return i.desconto; });
+    var media = comDesc.reduce(function(s, i){ return s + i.desconto; }, 0) / (comDesc.length || 1);
+    var html = '<div class="card"><div class="row" style="justify-content:space-between;gap:12px;flex-wrap:wrap">'
+      + '<h3 style="margin:0">Varredura da vitrine do fornecedor</h3>'
+      + '<span class="pill">' + fmt(VARR.lista.length) + " produtos</span></div>"
+      + '<p class="muted" style="margin:8px 0 0">Preço de cada produto lido direto da vitrine, 30 por página. '
+      + "A posição é a ordem de mais vendidos do fornecedor. Desconto médio: " + pct(media) + ".</p></div>";
+
+    html += '<div class="card"><div class="row" style="gap:8px;flex-wrap:wrap;align-items:center">'
+      + '<input id="v-busca" placeholder="buscar produto ou categoria" value="' + esc(VARR.busca) + '" '
+      + 'oninput="EMF.varrBusca(this.value)" style="flex:1;min-width:180px;padding:9px 12px;border-radius:10px;'
+      + 'border:1px solid var(--linha);background:var(--fundo2);color:var(--texto)">'
+      + ["posicao:Mais vendidos","desconto:Maior desconto","menor:Menor preço","nota:Melhor nota"].map(function(o){
+          var par = o.split(":"); 
+          return '<button class="btn' + (VARR.ordem === par[0] ? " primario" : "") + '" onclick="EMF.varrOrdem(\'' + par[0] + '\')">' + par[1] + "</button>";
+        }).join("")
+      + '</div></div>';
+
+    html += '<div class="card"><div class="tabela"><table><thead><tr>'
+      + "<th>#</th><th>Produto</th><th>Categoria</th><th>Preço</th><th>De</th><th>Desconto</th>"
+      + "<th>Mínimo p/ 30%</th><th>Vendidos</th><th></th></tr></thead><tbody>";
+
+    lista.slice(0, 120).forEach(function(i){
+      var melhor = Object.keys(i.minimo_30 || {}).sort(function(a, b){ return i.minimo_30[a] - i.minimo_30[b]; })[0];
+      var vend = VARR.vendidos[i.url];
+      html += "<tr><td>" + i.posicao + "</td>"
+        + '<td style="min-width:230px">' + esc(i.nome.slice(0, 70)) + "</td>"
+        + '<td class="muted">' + esc((i.categoria || "").slice(0, 22)) + "</td>"
+        + '<td class="n">' + brl(i.preco) + "</td>"
+        + '<td class="n muted">' + (i.preco_de ? brl(i.preco_de) : "—") + "</td>"
+        + '<td class="n" style="color:var(--ok)">' + (i.desconto ? pct(i.desconto) : "—") + "</td>"
+        + '<td class="n">' + (melhor ? brl(i.minimo_30[melhor]) + ' <span class="muted">' + melhor.split(" ")[0] + "</span>" : "—") + "</td>"
+        + '<td class="n">' + (vend ? fmt(vend) : "—") + "</td>"
+        + '<td><a class="btn" href="' + esc(i.url) + '" target="_blank" rel="noopener">Abrir</a></td></tr>';
+    });
+    html += "</tbody></table></div>"
+      + '<p class="muted" style="margin-top:10px">Mostrando ' + Math.min(120, lista.length) + " de "
+      + fmt(lista.length) + " filtrados. Use a busca para achar um produto específico. "
+      + "A coluna Vendidos só aparece nos itens já analisados individualmente.</p></div>";
+    return html;
+  }
 
   function carregarConcorrencia(){
     fetch("concorrencia.json").then(function(r){ return r.json(); }).then(function(d){
@@ -1592,6 +1672,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
 
   carregarCatalogo();
   carregarConcorrencia();
+  carregarVarredura();
   carregarRanking();
   render();
   autoExecutar();

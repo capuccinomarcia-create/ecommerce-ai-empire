@@ -31,7 +31,31 @@
     "Shopee": 337.12,
     "Mercado Livre": 347.6,
     "TikTok Shop": 386.94
-   }
+   },
+   "preco_mercado": 259.0,
+   "faixa_mercado": [
+    250.0,
+    280.0
+   ],
+   "fontes_mercado": [
+    "youtube/ML: mini projetor mais vendido R$ 250",
+    "anúncio portátil R$ 279,86"
+   ],
+   "margem_mercado": {
+    "Shopee": {
+     "margem_pct": 1.1,
+     "lucro": 2.84
+    },
+    "Mercado Livre": {
+     "margem_pct": 3.6,
+     "lucro": 9.43
+    },
+    "TikTok Shop": {
+     "margem_pct": 8.3,
+     "lucro": 21.56
+    }
+   },
+   "veredito": "inviável"
   },
   {
    "produto": "Caixa De Som Bluetooth Com Microfone Grande Led USB Potente",
@@ -57,7 +81,31 @@
     "Shopee": 212.44,
     "Mercado Livre": 220.55,
     "TikTok Shop": 243.32
-   }
+   },
+   "preco_mercado": 89.9,
+   "faixa_mercado": [
+    76.53,
+    114.31
+   ],
+   "fontes_mercado": [
+    "ML MLB28482209: R$ 76,53",
+    "Buscapé/Magalu: R$ 114,31"
+   ],
+   "margem_mercado": {
+    "Shopee": {
+     "margem_pct": -70.8,
+     "lucro": -63.68
+    },
+    "Mercado Livre": {
+     "margem_pct": -65.4,
+     "lucro": -58.78
+    },
+    "TikTok Shop": {
+     "margem_pct": -65.0,
+     "lucro": -58.48
+    }
+   },
+   "veredito": "inviável"
   },
   {
    "produto": "Mochila Escolar Infantil Estampada Com Lancheira E Estojo",
@@ -83,7 +131,31 @@
     "Shopee": 133.3,
     "Mercado Livre": 139.91,
     "TikTok Shop": 152.16
-   }
+   },
+   "preco_mercado": 149.9,
+   "faixa_mercado": [
+    134.9,
+    199.99
+   ],
+   "fontes_mercado": [
+    "ML kit mochila+lancheira+estojo: R$ 134,90 a R$ 199,99",
+    "Amazon: R$ 161,49"
+   ],
+   "margem_mercado": {
+    "Shopee": {
+     "margem_pct": 25.4,
+     "lucro": 38.01
+    },
+    "Mercado Livre": {
+     "margem_pct": 29.0,
+     "lucro": 43.51
+    },
+    "TikTok Shop": {
+     "margem_pct": 32.0,
+     "lucro": 48.01
+    }
+   },
+   "veredito": "vale"
   },
   {
    "produto": "Kit Maleta Profissional De Ferramentas 200 Peças Resistente",
@@ -109,7 +181,32 @@
     "Shopee": 135.02,
     "Mercado Livre": 141.66,
     "TikTok Shop": 154.14
-   }
+   },
+   "preco_mercado": 106.6,
+   "faixa_mercado": [
+    65.9,
+    125.38
+   ],
+   "fontes_mercado": [
+    "ML MLBU5086667451: R$ 106,60",
+    "Shopee: R$ 65,90",
+    "ML: R$ 125,38"
+   ],
+   "margem_mercado": {
+    "Shopee": {
+     "margem_pct": -0.3,
+     "lucro": -0.31
+    },
+    "Mercado Livre": {
+     "margem_pct": 4.5,
+     "lucro": 4.75
+    },
+    "TikTok Shop": {
+     "margem_pct": 5.8,
+     "lucro": 6.21
+    }
+   },
+   "veredito": "inviável"
   },
   {
    "produto": "Relógio Smartwatch T900 Ultra 49mm Tela Infinita 2 Pulseiras",
@@ -135,7 +232,32 @@
     "Shopee": 98.54,
     "Mercado Livre": 104.49,
     "TikTok Shop": 112.12
-   }
+   },
+   "preco_mercado": 59.99,
+   "faixa_mercado": [
+    51.07,
+    74.9
+   ],
+   "fontes_mercado": [
+    "ML MLB50616031: R$ 51,07",
+    "ML: R$ 59,99",
+    "ML T900 Ultra 2: R$ 74,90"
+   ],
+   "margem_mercado": {
+    "Shopee": {
+     "margem_pct": -28.9,
+     "lucro": -17.31
+    },
+    "Mercado Livre": {
+     "margem_pct": -31.2,
+     "lucro": -18.71
+    },
+    "TikTok Shop": {
+     "margem_pct": -24.2,
+     "lucro": -14.51
+    }
+   },
+   "veredito": "inviável"
   },
   {
    "produto": "Caixa de Som Bluetooth Portátil com LED À Prova De Água",
@@ -161,7 +283,30 @@
     "Shopee": 98.54,
     "Mercado Livre": 104.49,
     "TikTok Shop": 112.12
-   }
+   },
+   "preco_mercado": 99.0,
+   "faixa_mercado": [
+    76.53,
+    114.31
+   ],
+   "fontes_mercado": [
+    "mesma faixa da categoria em ML/Buscapé"
+   ],
+   "margem_mercado": {
+    "Shopee": {
+     "margem_pct": 16.4,
+     "lucro": 16.24
+    },
+    "Mercado Livre": {
+     "margem_pct": 21.4,
+     "lucro": 21.23
+    },
+    "TikTok Shop": {
+     "margem_pct": 22.4,
+     "lucro": 22.16
+    }
+   },
+   "veredito": "apertado"
   },
   {
    "produto": "Fone De Ouvido Sem Fio Kaidi TWS Premium Bluetooth 5.4",
@@ -187,7 +332,31 @@
     "Shopee": 74.98,
     "Mercado Livre": 80.48,
     "TikTok Shop": 84.98
-   }
+   },
+   "preco_mercado": 45.0,
+   "faixa_mercado": [
+    31.26,
+    55.2
+   ],
+   "fontes_mercado": [
+    "Magalu TWS duplo: R$ 31,26",
+    "Buscapé i12 TWS: R$ 55,20"
+   ],
+   "margem_mercado": {
+    "Shopee": {
+     "margem_pct": -34.0,
+     "lucro": -15.29
+    },
+    "Mercado Livre": {
+     "margem_pct": -37.4,
+     "lucro": -16.84
+    },
+    "TikTok Shop": {
+     "margem_pct": -30.0,
+     "lucro": -13.49
+    }
+   },
+   "veredito": "inviável"
   },
   {
    "produto": "Mochila Universitária Feminina Estampa De Capivara",
@@ -213,7 +382,9 @@
     "Shopee": 74.98,
     "Mercado Livre": 80.48,
     "TikTok Shop": 84.98
-   }
+   },
+   "preco_mercado": null,
+   "margem_mercado": null
   },
   {
    "produto": "Box 12 Mini Livros Histórias Bíblicas Educacional Infantil",
@@ -251,7 +422,9 @@
     "Shopee": 59.18,
     "Mercado Livre": 64.38,
     "TikTok Shop": 66.78
-   }
+   },
+   "preco_mercado": null,
+   "margem_mercado": null
   },
   {
    "produto": "Livro Bíblico Devocional Conversa Com Deus Pai 384 Páginas",
@@ -289,7 +462,9 @@
     "Shopee": 51.28,
     "Mercado Livre": 56.33,
     "TikTok Shop": 57.68
-   }
+   },
+   "preco_mercado": null,
+   "margem_mercado": null
   },
   {
    "produto": "Carteira Compacta Resistente Masculina Porta Cartões e Documento",
@@ -315,7 +490,9 @@
     "Shopee": 43.38,
     "Mercado Livre": 48.28,
     "TikTok Shop": 48.58
-   }
+   },
+   "preco_mercado": null,
+   "margem_mercado": null
   },
   {
    "produto": "Livro Diário Do Enaldinho Minha Escola É Mal Assombrada",
@@ -353,7 +530,31 @@
     "Shopee": 27.58,
     "Mercado Livre": 26.18,
     "TikTok Shop": 30.38
-   }
+   },
+   "preco_mercado": 32.9,
+   "faixa_mercado": [
+    23.75,
+    34.89
+   ],
+   "fontes_mercado": [
+    "Shopee: R$ 32,90 e R$ 27,88",
+    "ML: R$ 23,75 a R$ 34,89"
+   ],
+   "margem_mercado": {
+    "Shopee": {
+     "margem_pct": 13.1,
+     "lucro": 4.3
+    },
+    "Mercado Livre": {
+     "margem_pct": 8.0,
+     "lucro": 2.63
+    },
+    "TikTok Shop": {
+     "margem_pct": 17.1,
+     "lucro": 5.62
+    }
+   },
+   "veredito": "apertado"
   },
   {
    "produto": "Squishy Cubo De Queijo Macio Alívio Antiestresse De Apertar",
@@ -379,7 +580,30 @@
     "Shopee": 23.65,
     "Mercado Livre": 22.17,
     "TikTok Shop": 25.85
-   }
+   },
+   "preco_mercado": 16.9,
+   "faixa_mercado": [
+    15.9,
+    17.99
+   ],
+   "fontes_mercado": [
+    "Shopee kit squishy: R$ 15,90 a R$ 17,99"
+   ],
+   "margem_mercado": {
+    "Shopee": {
+     "margem_pct": -41.2,
+     "lucro": -6.97
+    },
+    "Mercado Livre": {
+     "margem_pct": -52.1,
+     "lucro": -8.8
+    },
+    "TikTok Shop": {
+     "margem_pct": -37.2,
+     "lucro": -6.29
+    }
+   },
+   "veredito": "inviável"
   },
   {
    "produto": "Livro Dale Carnegie Como Fazer Amigos E Influenciar Pessoas",
@@ -417,7 +641,9 @@
     "Shopee": 22.84,
     "Mercado Livre": 21.35,
     "TikTok Shop": 24.92
-   }
+   },
+   "preco_mercado": null,
+   "margem_mercado": null
   },
   {
    "produto": "Livro  Principis O Alienista Machado De Assis",
@@ -455,7 +681,9 @@
     "Shopee": 11.78,
     "Mercado Livre": 10.08,
     "TikTok Shop": 12.98
-   }
+   },
+   "preco_mercado": null,
+   "margem_mercado": null
   },
   {
    "produto": "Pendente Guirlanda De Natal 10cm Com Sino E Laço Vermelho",
@@ -493,7 +721,9 @@
     "Shopee": 10.2,
     "Mercado Livre": 8.47,
     "TikTok Shop": 11.28
-   }
+   },
+   "preco_mercado": null,
+   "margem_mercado": null
   },
   {
    "produto": "Fita Decorativa Natalina Aramada Decoração Natal Vemelha  6cm x 2,7m",
@@ -531,7 +761,9 @@
     "Shopee": 8.62,
     "Mercado Livre": 6.86,
     "TikTok Shop": 9.58
-   }
+   },
+   "preco_mercado": null,
+   "margem_mercado": null
   },
   {
    "produto": "Fita Decorativa Natalina Aramada Decoração Natal Dourada Gliter 6cm x 2,7m",
@@ -569,7 +801,9 @@
     "Shopee": 8.62,
     "Mercado Livre": 6.86,
     "TikTok Shop": 9.58
-   }
+   },
+   "preco_mercado": null,
+   "margem_mercado": null
   },
   {
    "produto": "Capa Porta Cartão Cracha Decorado Bichinhos Fofos Com Mosquetão Removível",
@@ -599,7 +833,9 @@
     "Shopee": 7.83,
     "Mercado Livre": 6.06,
     "TikTok Shop": 8.73
-   }
+   },
+   "preco_mercado": null,
+   "margem_mercado": null
   },
   {
    "produto": "Sacola De Presente Natalina Saco Embalagem Estampas Natal Douradas G 32x26x10cm",
@@ -633,7 +869,9 @@
     "Shopee": 7.04,
     "Mercado Livre": 5.25,
     "TikTok Shop": 7.88
-   }
+   },
+   "preco_mercado": null,
+   "margem_mercado": null
   },
   {
    "produto": "Capa Porta Cartão Cracha Com Extensor E Orelha De Ursinho Documento",
@@ -671,7 +909,9 @@
     "Shopee": 6.25,
     "Mercado Livre": 4.45,
     "TikTok Shop": 7.03
-   }
+   },
+   "preco_mercado": null,
+   "margem_mercado": null
   },
   {
    "produto": "Capa Porta Cartão Cracha Com Extensor Simples Documento",
@@ -709,7 +949,9 @@
     "Shopee": 4.67,
     "Mercado Livre": 2.84,
     "TikTok Shop": 5.33
-   }
+   },
+   "preco_mercado": null,
+   "margem_mercado": null
   },
   {
    "produto": "Sacola De Presente Natalina Saco Embalagem Papai Noel 23x18x10cm",
@@ -735,7 +977,9 @@
     "Shopee": 3.88,
     "Mercado Livre": 2.03,
     "TikTok Shop": 4.48
-   }
+   },
+   "preco_mercado": null,
+   "margem_mercado": null
   },
   {
    "produto": "Kit Acessórios De Cabelo Infantil Com Presilhas Piranhas E Xuxinhas",
@@ -773,7 +1017,9 @@
     "Shopee": 3.25,
     "Mercado Livre": 1.39,
     "TikTok Shop": 3.8
-   }
+   },
+   "preco_mercado": null,
+   "margem_mercado": null
   },
   {
    "produto": "Chaveiro Mini Tênis Sapato Coloridos Com Cadarço",
@@ -807,7 +1053,9 @@
     "Shopee": 3.09,
     "Mercado Livre": 1.23,
     "TikTok Shop": 3.63
-   }
+   },
+   "preco_mercado": null,
+   "margem_mercado": null
   },
   {
    "produto": "Chaveiro De Gatinho Feliz Emborrachado Colorido",
@@ -833,7 +1081,12 @@
     "Shopee": 2.16,
     "Mercado Livre": 0.28,
     "TikTok Shop": 2.63
-   }
+   },
+   "preco_mercado": null,
+   "margem_mercado": null
   }
- ]
+ ],
+ "mercado_coletado_em": "2026-11-09",
+ "mercado_metodo": "preços de anúncios indexados no Google (Mercado Livre, Shopee, Buscapé, Magalu). Sem login nas plataformas.",
+ "mercado_aviso": "faixa observada em anúncios públicos; confirmar abrindo o anúncio antes de comprar estoque"
 }

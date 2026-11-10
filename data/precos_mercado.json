@@ -1,0 +1,27 @@
+{
+ "coletado_em": "2026-11-09",
+ "metodo": "preços de anúncios indexados no Google (Mercado Livre, Shopee, Buscapé, Magalu). Sem login nas plataformas.",
+ "aviso": "faixa observada em anúncios públicos; confirmar abrindo o anúncio antes de comprar estoque",
+ "itens": [
+  {"chave": "Mini Projetor", "preco_mercado": 259.00, "faixa": [250.00, 280.00],
+   "fontes": ["youtube/ML: mini projetor mais vendido R$ 250", "anúncio portátil R$ 279,86"]},
+  {"chave": "Caixa De Som Bluetooth Com Microfone", "preco_mercado": 89.90, "faixa": [76.53, 114.31],
+   "fontes": ["ML MLB28482209: R$ 76,53", "Buscapé/Magalu: R$ 114,31"]},
+  {"chave": "Mochila Escolar Infantil", "preco_mercado": 149.90, "faixa": [134.90, 199.99],
+   "fontes": ["ML kit mochila+lancheira+estojo: R$ 134,90 a R$ 199,99", "Amazon: R$ 161,49"]},
+  {"chave": "Kit Maleta Profissional De Ferramentas", "preco_mercado": 106.60, "faixa": [65.90, 125.38],
+   "fontes": ["ML MLBU5086667451: R$ 106,60", "Shopee: R$ 65,90", "ML: R$ 125,38"]},
+  {"chave": "Relógio Smartwatch T900", "preco_mercado": 59.99, "faixa": [51.07, 74.90],
+   "fontes": ["ML MLB50616031: R$ 51,07", "ML: R$ 59,99", "ML T900 Ultra 2: R$ 74,90"]},
+  {"chave": "Caixa de Som Bluetooth Portátil com LED", "preco_mercado": 99.00, "faixa": [76.53, 114.31],
+   "fontes": ["mesma faixa da categoria em ML/Buscapé"]},
+  {"chave": "Fone De Ouvido Sem Fio Kaidi", "preco_mercado": 45.00, "faixa": [31.26, 55.20],
+   "fontes": ["Magalu TWS duplo: R$ 31,26", "Buscapé i12 TWS: R$ 55,20"]},
+  {"chave": "Mini Livros Bíblicos", "preco_mercado": 33.70, "faixa": [14.43, 33.70],
+   "fontes": ["Shopee kit 15un: R$ 33,70", "Shopee kit 8un: R$ 26,30", "Shopee kit 6un: R$ 14,43"]},
+  {"chave": "Livro Diário Do Enaldinho", "preco_mercado": 32.90, "faixa": [23.75, 34.89],
+   "fontes": ["Shopee: R$ 32,90 e R$ 27,88", "ML: R$ 23,75 a R$ 34,89"]},
+  {"chave": "Squishy Cubo De Queijo", "preco_mercado": 16.90, "faixa": [15.90, 17.99],
+   "fontes": ["Shopee kit squishy: R$ 15,90 a R$ 17,99"]}
+ ]
+}

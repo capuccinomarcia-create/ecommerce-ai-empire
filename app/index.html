@@ -849,8 +849,19 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
     return { canal: c, margem: m };
   }
 
+  function melhorMargemReal(l){
+    var m = l.margem_mercado || {};
+    var canais = Object.keys(m);
+    if(!canais.length) return { canal: "-", margem_pct: 0, lucro: 0 };
+    var canal = canais.reduce(function(a, b){ return m[a].lucro >= m[b].lucro ? a : b; });
+    return { canal: canal, margem_pct: m[canal].margem_pct, lucro: m[canal].lucro };
+  }
+
   function rankOrdenado(){
     var lista = RANK.lista.slice();
+    if(RANK.ordem === "real") return lista.slice().sort(function(a, b){
+      return melhorMargemReal(b).margem_pct - melhorMargemReal(a).margem_pct;
+    });
     if(RANK.ordem === "vendidos"){
       lista.sort(function(a,b){ return (b.vendidos || 0) - (a.vendidos || 0); });
     } else if(RANK.ordem === "lucro"){
@@ -881,7 +892,8 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
       + '<h3 style="margin:0">Ranking do fornecedor</h3>'
       + '<span class="pill">' + RANK.lista.length + " produtos com margem ≥ 20%</span></div>"
       + '<p class="muted" style="margin:8px 0 0">Preço e quantidade vendida lidos na página de cada produto. '
-      + "Margem calculada com venda = " + (RANK.meta ? RANK.meta.markup : 3) + "x o custo.</p></div>";
+      + "Margem de planejamento com venda = " + (RANK.meta ? RANK.meta.markup : 3) + "x o custo. "
+      + "A coluna Mercado usa preço real observado em anúncios.</p></div>";
 
     html += '<div class="grid">'
       + kpi("Maior margem agora", pct(m.margem), top.produto.slice(0, 34), "ok")
@@ -894,12 +906,13 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
       + '<button class="btn' + (RANK.ordem === "margem" ? " primario" : "") + '" onclick="EMF.rankOrdem(\'margem\')">Maior margem</button>'
       + '<button class="btn' + (RANK.ordem === "vendidos" ? " primario" : "") + '" onclick="EMF.rankOrdem(\'vendidos\')">Mais vendidos</button>'
       + '<button class="btn' + (RANK.ordem === "lucro" ? " primario" : "") + '" onclick="EMF.rankOrdem(\'lucro\')">Maior lucro</button>'
+      + '<button class="btn' + (RANK.ordem === "real" ? " primario" : "") + '" onclick="EMF.rankOrdem(\'real\')">Margem real</button>'
       + '<a class="btn" href="' + esc(top.url) + '" target="_blank" rel="noopener">Abrir fornecedor</a>'
       + "</div></div>";
 
     html += '<div class="card"><table class="tabela"><thead><tr>'
       + "<th>#</th><th>Produto</th><th>Custo</th><th>Venda</th>"
-      + "<th>ML</th><th>Shopee</th><th>TikTok</th><th>Vendidos</th><th></th></tr></thead><tbody>";
+      + "<th>ML</th><th>Shopee</th><th>TikTok</th><th>Mercado</th><th>Margem real</th><th>Veredito</th><th>Vendidos</th><th></th></tr></thead><tbody>";
     lista.forEach(function(l, i){
       var canal = melhorMargem(l).canal;
       function cel(c){ var v = l.margens[c]; return '<td class="n">' + pct(v) + (c === canal ? " ★" : "") + "</td>"; }
@@ -909,6 +922,9 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
         + '<td class="n">' + brl(l.custo) + "</td>"
         + '<td class="n">' + brl(l.venda) + "</td>"
         + cel("Mercado Livre") + cel("Shopee") + cel("TikTok Shop")
+        + '<td class="n">' + (l.preco_mercado == null ? "—" : brl(l.preco_mercado)) + "</td>"
+        + '<td class="n">' + (l.margem_mercado ? pct(melhorMargemReal(l).margem_pct) : "—") + "</td>"
+        + '<td>' + (l.veredito ? '<span class="pill">' + l.veredito + "</span>" : "—") + "</td>"
         + '<td class="n">' + (l.vendidos == null ? "não informado" : fmt(l.vendidos)) + "</td>"
         + '<td><a class="btn" style="padding:4px 8px;font-size:12px" href="' + esc(l.url) + '" target="_blank" rel="noopener">Ver</a></td></tr>';
     });

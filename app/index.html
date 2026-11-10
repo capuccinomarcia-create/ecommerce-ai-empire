@@ -1619,7 +1619,15 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
     return html;
   }
 
-  window.EMF = {
+  Object.assign(window.EMF || {}, {
+    rankOrdem: function(ordem){
+      RANK.ordem = ordem || "margem";
+      render();
+    },
+    varrOrdem: function(ordem){
+      VARR.ordem = ordem || "vendidos";
+      render();
+    },
     capturar: function(){
       var el = document.getElementById("c-canal");
       if(el) CONC.canal = el.value;
@@ -1668,7 +1676,7 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
       Object.keys(e).forEach(function(k){ CONC.alvo[k] = e[k]; });
       render();
     }
-  };
+  });
 
   carregarCatalogo();
   carregarConcorrencia();

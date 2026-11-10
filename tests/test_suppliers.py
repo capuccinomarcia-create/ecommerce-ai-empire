@@ -63,7 +63,9 @@ def test_preco_por_faixa_respeita_quantidade():
 
 
 def test_melhor_oferta_sem_preco_confirmado_nao_chuta():
-    resultado = suppliers.melhor_oferta("diario do enaldinho", quantidade=1)
+    acervo = suppliers.carregar()
+    sem_preco = next(i for i in acervo if not i.preco_confirmado)
+    resultado = suppliers.melhor_oferta(sem_preco.produto, quantidade=1)
     assert resultado is not None
     assert resultado["oferta"] is None
     assert "preço confirmado" in resultado["motivo"]

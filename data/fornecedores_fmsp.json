@@ -17,6 +17,18 @@
     {
      "minimo": 1,
      "preco_unidade": 136.99
+    },
+    {
+     "minimo": 4,
+     "preco_unidade": 132.88
+    },
+    {
+     "minimo": 8,
+     "preco_unidade": 130.14
+    },
+    {
+     "minimo": 10,
+     "preco_unidade": 123.29
     }
    ],
    "quantidade_minima": 1,
@@ -48,6 +60,18 @@
     {
      "minimo": 1,
      "preco_unidade": 49.99
+    },
+    {
+     "minimo": 4,
+     "preco_unidade": 48.49
+    },
+    {
+     "minimo": 8,
+     "preco_unidade": 47.49
+    },
+    {
+     "minimo": 10,
+     "preco_unidade": 44.99
     }
    ],
    "quantidade_minima": 1,
@@ -77,8 +101,20 @@
    "preco_1un": 17.5,
    "faixas_quantidade": [
     {
-     "minimo": 1,
+     "minimo": 0,
      "preco_unidade": 17.5
+    },
+    {
+     "minimo": 4,
+     "preco_unidade": 16.98
+    },
+    {
+     "minimo": 8,
+     "preco_unidade": 16.63
+    },
+    {
+     "minimo": 10,
+     "preco_unidade": 15.75
     }
    ],
    "quantidade_minima": 1,
@@ -110,6 +146,18 @@
     {
      "minimo": 1,
      "preco_unidade": 29.99
+    },
+    {
+     "minimo": 4,
+     "preco_unidade": 29.09
+    },
+    {
+     "minimo": 8,
+     "preco_unidade": 28.49
+    },
+    {
+     "minimo": 10,
+     "preco_unidade": 26.99
     }
    ],
    "quantidade_minima": 1,
@@ -139,8 +187,20 @@
    "preco_1un": 49.99,
    "faixas_quantidade": [
     {
-     "minimo": 1,
+     "minimo": 0,
      "preco_unidade": 49.99
+    },
+    {
+     "minimo": 4,
+     "preco_unidade": 48.49
+    },
+    {
+     "minimo": 8,
+     "preco_unidade": 47.49
+    },
+    {
+     "minimo": 10,
+     "preco_unidade": 44.99
     }
    ],
    "quantidade_minima": 1,
@@ -172,6 +232,18 @@
     {
      "minimo": 1,
      "preco_unidade": 64.9
+    },
+    {
+     "minimo": 4,
+     "preco_unidade": 62.95
+    },
+    {
+     "minimo": 8,
+     "preco_unidade": 61.66
+    },
+    {
+     "minimo": 10,
+     "preco_unidade": 58.41
     }
    ],
    "quantidade_minima": 1,
@@ -203,6 +275,18 @@
     {
      "minimo": 1,
      "preco_unidade": 64.9
+    },
+    {
+     "minimo": 4,
+     "preco_unidade": 62.95
+    },
+    {
+     "minimo": 8,
+     "preco_unidade": 61.66
+    },
+    {
+     "minimo": 10,
+     "preco_unidade": 58.41
     }
    ],
    "quantidade_minima": 1,
@@ -234,6 +318,18 @@
     {
      "minimo": 1,
      "preco_unidade": 215.9
+    },
+    {
+     "minimo": 4,
+     "preco_unidade": 209.42
+    },
+    {
+     "minimo": 8,
+     "preco_unidade": 205.11
+    },
+    {
+     "minimo": 10,
+     "preco_unidade": 194.31
     }
    ],
    "quantidade_minima": 1,
@@ -265,6 +361,18 @@
     {
      "minimo": 1,
      "preco_unidade": 87.99
+    },
+    {
+     "minimo": 4,
+     "preco_unidade": 85.35
+    },
+    {
+     "minimo": 8,
+     "preco_unidade": 83.59
+    },
+    {
+     "minimo": 10,
+     "preco_unidade": 79.19
     }
    ],
    "quantidade_minima": 1,
@@ -296,6 +404,18 @@
     {
      "minimo": 1,
      "preco_unidade": 86.9
+    },
+    {
+     "minimo": 4,
+     "preco_unidade": 84.29
+    },
+    {
+     "minimo": 8,
+     "preco_unidade": 82.56
+    },
+    {
+     "minimo": 10,
+     "preco_unidade": 78.21
     }
    ],
    "quantidade_minima": 1,

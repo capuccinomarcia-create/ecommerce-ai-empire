@@ -888,7 +888,9 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
     }
     var lista = rankOrdenado();
     var top = lista[0];
-    var m = melhorMargem(top);
+    // o KPI deve mostrar a maior margem real do conjunto, não a da linha do topo
+    var campeao = RANK.lista.slice().sort(function(a, b){ return melhorMargem(b).margem - melhorMargem(a).margem; })[0];
+    var m = melhorMargem(campeao)
     var html = '<div class="card"><div class="row" style="justify-content:space-between;gap:12px;flex-wrap:wrap">'
       + '<h3 style="margin:0">Ranking do fornecedor</h3>'
       + '<span class="pill">' + RANK.lista.length + " produtos com margem ≥ 20%</span></div>"
@@ -897,10 +899,10 @@ code{background:#0f172a;border:1px solid var(--line);padding:1px 5px;border-radi
       + "A coluna Mercado usa preço real observado em anúncios.</p></div>";
 
     html += '<div class="grid">'
-      + kpi("Maior margem agora", pct(m.margem), top.produto.slice(0, 34), "ok")
-      + kpi("Custo unitário", brl(top.custo), "faixa 1 a 3 unidades")
-      + kpi("Venda sugerida", brl(top.venda), "≈ 3x o custo")
-      + kpi("Vendidos no fornecedor", fmt(top.vendidos), top.nota ? "nota " + top.nota : "nota não informada")
+      + kpi("Maior margem agora", pct(m.margem), campeao.produto.slice(0, 34), "ok")
+      + kpi("Custo unitário", brl(campeao.custo), "faixa 1 a 3 unidades")
+      + kpi("Venda sugerida", brl(campeao.venda), "≈ 3x o custo")
+      + kpi("Vendidos no fornecedor", fmt(campeao.vendidos), campeao.nota ? "nota " + campeao.nota : "nota não informada")
       + "</div>";
 
     html += '<div class="card"><div class="row" style="gap:8px;flex-wrap:wrap">'
